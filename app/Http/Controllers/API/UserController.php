@@ -15,47 +15,78 @@ use Illuminate\Support\Str;
 class UserController extends Controller
 {
     public $successStatus = 200;
-/**
+    /**
      * login api
      *
      * @return \Illuminate\Http\Response
      */
     public function login(){
-        if(Auth::attempt(['email' => request('email'), 'password' => request('password')])){
-            $user = Auth::user();
-            $success['token'] =  $user->createToken('MyApp')-> accessToken;
-            return response()->json(['success' => $success,'user'=>$user], $this-> successStatus);
-        }
-        else{
-            return response()->json(['error'=>'Unauthorised'], 401);
-        }
+        $falg =false;
+
+        if(request('social_media') == 0){
+         if(Auth::attempt(['email' => request('email'), 'password' => request('password')]))
+            $falg =true;
+        }else{
+            $falg =true;
+            $user =User::where('email',"=",request('email'))->first();
+            Auth::loginUsingId( $user->id);
+        
+        }    
+            
+            if($falg){
+                $user = Auth::user();
+                $success['token'] =  $user->createToken('MyApp')-> accessToken;
+                return response()->json(['success' => $success,'user'=>$user], $this-> successStatus);
+            }else{
+                return response()->json(['error'=>'Unauthorised'], 401);
+            }
     }
-/**
+    /**
      * Register api
      *
      * @return \Illuminate\Http\Response
      */
     public function register(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8'],
-            'age' => ['required', 'integer'],
-            // 'c_password' => 'required|same:password',
-        ]);
-        if ($validator->fails()) {
+        $social_media  =false;
+        if($request->has('social_media'))
+            if(request('social_media') == 1)
+              $social_media = true;
+            
+            $input = $request->all();
+            
+            if($social_media){
+                $validator = Validator::make($request->all(), [
+                    'name' => ['required', 'string', 'max:255'],
+                    'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+                    
+                ]);
+                if ($validator->fails()) {
                     return response()->json(['error'=>$validator->errors()], 401);
                 }
-        $input = $request->all();
+                
+            }else{
+                $validator = Validator::make($request->all(), [
+                    'name' => ['required', 'string', 'max:255'],
+                    'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+                    'password' => ['required', 'string', 'min:8'],
+                    'age' => ['required', 'integer'],
+                    // 'c_password' => 'required|same:password',
+                ]);
+                if ($validator->fails()) {
+                    return response()->json(['error'=>$validator->errors()], 401);
+                }
                 $input['password'] = bcrypt($input['password']);
-                $input['referral_code'] = Str::random(6);
-                $user = User::create($input);
-                $success['token'] =  $user->createToken('MyApp')-> accessToken;
-                $success['user'] =  $user;
-        return response()->json(['success'=>$success], $this-> successStatus);
+                
+            }
+            $input['referral_code'] = Str::random(6);
+            
+            $user = User::create($input);
+            $success['token'] =  $user->createToken('MyApp')-> accessToken;
+            $success['user'] =  $user;
+            return response()->json(['success'=>$success], $this-> successStatus);
     }
-/**
+    /**
      * details api
      *
      * @return \Illuminate\Http\Response
@@ -65,35 +96,35 @@ class UserController extends Controller
         $user = Auth::user();
         return response()->json(['success' => $user], $this-> successStatus);
     }
-
+    
     public function index()
     {
         $users = User::all()->where('role','user');
-
+        
         return view('admin.users.index',['users'=>$users]);
     }
-
+    
     public function edit($id)
     {
         $user = User::findOrFail($id);
         if($user){
-        return view('admin.users.edit',['user'=>$user]);
-
+            return view('admin.users.edit',['user'=>$user]);
+            
         }
         return view('admin.users');
-
-
+        
+        
     }
-     public function delete($id)
+    public function delete($id)
     {
-            $user = User::findOrFail($id);
-            if($user){
-                $user->delete();
+        $user = User::findOrFail($id);
+        if($user){
+            $user->delete();
             return redirect('/users')->with('error','User Delete Successfully.');
-
-            }
+            
+        }
     }
-
+    
     public function update(Request $request ,$id)
     {
         $user = User::findOrFail($id);
@@ -102,16 +133,16 @@ class UserController extends Controller
             $user->email = $request->email;
             $user->age = $request->age;
             $user->status = $request->status;
-
+            
             $user->save();
             return redirect('/users')->with('success','User Update Successfully.');
-
+            
         }
         return redirect('/users')->with('error','User Update Failed.');
-
-
+        
+        
     }
-
+    
     public function setUserPoint(Request $request)
     {
         if( Auth::user()){
@@ -120,9 +151,9 @@ class UserController extends Controller
             $points->game_id = $request->game_id;
             $points->points = $request->points;
             $points->save();
-
+            
             return response()->json(['success' => Auth::user()], $this-> successStatus);
-
+            
         }
     }
 }
