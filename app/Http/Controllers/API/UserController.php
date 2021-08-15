@@ -20,6 +20,13 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+
+     public function x(){
+
+
+        return "x";
+     }
     public function login(){
         $falg =false;
 
