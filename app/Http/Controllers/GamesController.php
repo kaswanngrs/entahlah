@@ -117,8 +117,8 @@ class GamesController extends Controller
         $attributes->attempts = $request->attempts ;
         $attributes->ads_count = $request->ads_count ;
         $attributes->points_per_try = $request->points_per_try ;
-
         $attributes->save();
+        
         return redirect('/games')->with('success','Game Attributes Update Successfully.');
 
     }

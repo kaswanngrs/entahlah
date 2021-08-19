@@ -31,6 +31,7 @@ class UserController extends Controller
         $falg =false;
 
         if(request('social_media') == 0){
+
          if(Auth::attempt(['email' => request('email'), 'password' => request('password')]))
             $falg =true;
         }else{
@@ -54,44 +55,25 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function register(Request $request)
+
     {
-        $social_media  =false;
-        if($request->has('social_media'))
-            if(request('social_media') == 1)
-              $social_media = true;
-            
-            $input = $request->all();
-            
-            if($social_media){
-                $validator = Validator::make($request->all(), [
-                    'name' => ['required', 'string', 'max:255'],
-                    'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-                    
-                ]);
-                if ($validator->fails()) {
+        $validator = Validator::make($request->all(), [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:8'],
+            'age' => ['required', 'integer'],
+            // 'c_password' => 'required|same:password',
+        ]);
+        if ($validator->fails()) {
                     return response()->json(['error'=>$validator->errors()], 401);
                 }
-                
-            }else{
-                $validator = Validator::make($request->all(), [
-                    'name' => ['required', 'string', 'max:255'],
-                    'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-                    'password' => ['required', 'string', 'min:8'],
-                    'age' => ['required', 'integer'],
-                    // 'c_password' => 'required|same:password',
-                ]);
-                if ($validator->fails()) {
-                    return response()->json(['error'=>$validator->errors()], 401);
-                }
+        $input = $request->all();
                 $input['password'] = bcrypt($input['password']);
-                
-            }
-            $input['referral_code'] = Str::random(6);
-            
-            $user = User::create($input);
-            $success['token'] =  $user->createToken('MyApp')-> accessToken;
-            $success['user'] =  $user;
-            return response()->json(['success'=>$success], $this-> successStatus);
+                $input['referral_code'] = Str::random(6);
+                $user = User::create($input);
+                $success['token'] =  $user->createToken('MyApp')-> accessToken;
+                $success['user'] =  $user;
+        return response()->json(['success'=>$success], $this-> successStatus);
     }
     /**
      * details api
