@@ -7,10 +7,13 @@ use App\GameAttribute;
 use App\Questions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\UserPoints;
 
+use function PHPUnit\Framework\isEmpty;
 
 class GamesController extends Controller
 {
+    
     /**
      * Display a listing of the resource.
      *
@@ -19,9 +22,9 @@ class GamesController extends Controller
     public function index()
     {
         $games = Games::all();
-       return view ('admin.games.index',['games'=>$games]);
+        return view('admin.games.index', ['games' => $games]);
     }
-
+    
     /**
      * Show the form for creating a new resource.
      *
@@ -31,7 +34,7 @@ class GamesController extends Controller
     {
         //
     }
-
+    
     /**
      * Store a newly created resource in storage.
      *
@@ -42,7 +45,7 @@ class GamesController extends Controller
     {
         //
     }
-
+    
     /**
      * Display the specified resource.
      *
@@ -53,7 +56,7 @@ class GamesController extends Controller
     {
         //
     }
-
+    
     /**
      * Show the form for editing the specified resource.
      *
@@ -63,12 +66,12 @@ class GamesController extends Controller
     public function edit(Request $request, $id)
     {
         $game = Games::findOrFail($id);
-        if($game){
-
-            return view('admin.games.edit',['game'=>$game]);
+        if ($game) {
+            
+            return view('admin.games.edit', ['game' => $game]);
         }
     }
-
+    
     /**
      * Update the specified resource in storage.
      *
@@ -79,15 +82,23 @@ class GamesController extends Controller
     public function update(Request $request, $id)
     {
         $game = Games::findOrFail($id);
-        if($game){
+        if ($game) {
             $game->name = $request->title;
             $game->status = $request->status;
             $game->save();
-
-            return redirect('/games')->with('success','Game Update Successfully.');
+            
+            return redirect('/games')->with('success', 'Game Update Successfully.');
         }
     }
-
+    public function TotalPoint(Request  $request ){
+        
+        if (Auth::user()) {
+            $data['UserPoints'] =  UserPoints::where("user_id","=",Auth::user()->id)->get();
+            return response()->json([$data], 201);
+            
+        }
+        
+    }
     /**
      * Remove the specified resource from storage.
      *
@@ -98,204 +109,355 @@ class GamesController extends Controller
     {
         //
     }
-
+    
     public function updateAttributes(Request $request, $id)
     {
         $game = Games::find($id);
-        if(isset($game->attributes)){
-            $game->attributes->attempts = $request->attempts ;
-            $game->attributes->ads_count = $request->ads_count ;
-            $game->attributes->points_per_try = $request->points_per_try ;
-
+        if (isset($game->attributes)) {
+            $game->attributes->attempts = $request->attempts;
+            $game->attributes->ads_count = $request->ads_count;
+            $game->attributes->points_per_try = $request->points_per_try;
+            
             $game->attributes->save();
-            return redirect('/games')->with('success','Game Attributes Update Successfully.');
-
+            return redirect('/games')->with('success', 'Game Attributes Update Successfully.');
         }
-
-        $attributes = new GameAttribute();
-        $attributes->game_id = $id ;
-        $attributes->attempts = $request->attempts ;
-        $attributes->ads_count = $request->ads_count ;
-        $attributes->points_per_try = $request->points_per_try ;
-        $attributes->save();
         
-        return redirect('/games')->with('success','Game Attributes Update Successfully.');
-
+        $attributes = new GameAttribute();
+        $attributes->game_id = $id;
+        $attributes->attempts = $request->attempts;
+        $attributes->ads_count = $request->ads_count;
+        $attributes->points_per_try = $request->points_per_try;
+        
+        $attributes->save();
+        return redirect('/games')->with('success', 'Game Attributes Update Successfully.');
     }
-
-    public function joinGame (Request $request)
+    
+    public function joinGame(Request $request)
     {
-        if(Auth::user()){
+        if (Auth::user()) {
             $game = Games::findOrFail($request->game_id);
-
-            if($game->status){
+            
+            
+            if ($game->status) {
                 $data = [];
-
+               $id_user=  Auth::user()->id;
                 $data['user'] = Auth::user();
-                $attempts = session()->get('join.attempts', 0);
-                $adds = session()->get('join.adds', 0);
-                if($attempts >= $game->attributes->attempts){
-                    if($adds >= $game->attributes->ads_count ){
+                $gameSession  = array(
+                    1 => 'join.attempts1'.$id_user,
+                    2 => 'join.attempts2'.$id_user,
+                    3 => 'join.attempts3'.$id_user,
+                    4 => 'join.attempts4'.$id_user,
+                );
+                
+                $gameSessionAdd  = array(
+                    1 => 'join.adds1'.$id_user,
+                    2 => 'join.adds2'.$id_user,
+                    3 => 'join.adds3'.$id_user,
+                    4 => 'join.adds4'.$id_user,
+                );
+                
+                $gameSessionAdd_number  = array(
+                    1 => 'join.add_number1'.$id_user,
+                    2 => 'join.adds_number2'.$id_user,
+                    3 => 'join.adds_number3'.$id_user,
+                    4 => 'join.adds_number4'.$id_user,
+                );
+                
+                
+                $attempts = session()->get($gameSession[$game->id], 0);
+                $adds = session()->get($gameSessionAdd[$game->id], 0);
+                $data['adds'] =  $adds;
+                $data['adds_max'] = $game->attributes->ads_count;
+                
+                
+                $data['attempts'] = $attempts;
+                $data['attempts_max'] = $game->attributes->attempts;
+                $data['adds_number'] = session()->get($gameSessionAdd_number[$game->id], 0);
+                
+                if ($request->show_adds  == 1) {
+                    
+                    $adds_number = session()->get($gameSessionAdd_number[$game->id], 0);
+                    
+                    if ($adds >= $game->attributes->ads_count) {
+                        $data = array("reached_upper_limit" => true);
+                        return response()->json([$data, 'msg' => 'scas'], 401, array('Content-Type'=>'application/json; charset=utf-8' ));
+                    } else {
+                        $data = array("reached_upper_limit" => false);
+                        
+                        session()->put($gameSessionAdd[$game->id], $adds + 1);
+                        
+                        session()->put($gameSessionAdd_number[$game->id], $adds_number + 5);
+                        $adds_number = session()->get($gameSessionAdd[$game->id], 0 );
+                        $data['adds_number'] = $adds_number;
+                        
+//                         return response()->json([$data, 'msg' => 'لقد  حصلت على 5 محاولات جديدة  '], 201, array('Content-Type'=>'application/json; charset=utf-8' ));
+                        return response()->json([$data, 'msg' => 'I got 5 new tries '], 201);
+                        
+                    }
+                }
+                
+                
+                
+                
+                if ($attempts >= $game->attributes->attempts) {
+                    if ($adds >= $game->attributes->ads_count) {
                         $data['can_view_adds'] = false;
                         $data['can_join_game'] = false;
-                        return response()->json([$data,'msg'=>'لقد تجاوزت الحد الاعلى للمحاولات .. حاول غدا '], 401);
+//                         return response()->json([$data, 'msg' => 'لقد تجاوزت الحد الاعلى للمحاولات .. حاول غدا '], 401, array('Content-Type'=>'application/json; charset=utf-8' ));
+                        return response()->json([$data, 'msg' => 'You have exceeded the maximum number of attempts.. try tomorrow '], 201);
+                        
                     }
-
+                    
                     $data['can_view_adds'] = true;
                     $data['can_join_game'] = false;
-                    session()->put('join.adds', $adds + 1);
-
-                     $data['questions'] = Questions::where('status',1)->with('answers')->get();
-
-                    return response()->json([$data], 200);
-
-
+                    $adds_number = session()->get($gameSessionAdd_number[$game->id], 0);
+                    
+                    if ($adds_number <= 0)
+//                         return response()->json([$data, 'msg' => 'لقد تجاوزت الحد الاعلى للمحاولات .. شاهد أعلان '], 401, array('Content-Type'=>'application/json; charset=utf-8' ));
+                        return response()->json([$data, 'msg' => 'You have exceeded the maximum number of attempts.. Watch an ad  '], 201);
+                        
+                        
+                        
+                        if ($game->id == 2)
+                            $data['questions'] = Questions::where('status', 1)->with('answers')->get();
+                            
+                            session()->put($gameSessionAdd_number[$game->id], $adds_number - 1);
+                            
+                            $data['new_attempts'] =  $adds_number;
+                            
+                            return response()->json([$data], 200);
                 }
-
-                session()->put('join.attempts', $attempts + 1);
-
-                $data['can_view_adds'] = true ;
-                $data['can_join_game'] = true ;
-                $data['questions'] = Questions::where('status',1)->with('answers')->get();
-                return response()->json([$data], 200);
-
-
+                
+                session()->put($gameSession[$game->id], $attempts + 1);
+                
+                $data['can_view_adds'] = true;
+                $data['can_join_game'] = true;
+                if ($game->id == 2)
+                    $data['questions'] = Questions::where('status', 1)->with('answers')->get();
+                    
+                    $data['attempts'] = $attempts;
+                    $data['attempts_max'] = $game->attributes->attempts;
+                    
+                    return response()->json([$data], 200);
             }
         }
     }
-
+    
+    
+    
+    public function adds_show(Request $request)
+    {
+        $data = $request->session()->all();
+        return response()->json([$data, 'msg' => 'You have exceeded the maximum number of attempts.. try tomorrow  '], 401);
+        
+        if (Auth::user()) {
+            $game = Games::findOrFail($request->game_id);
+            $gameSessionAdd  = array(
+                1 => 'join.adds1',
+                2 => 'join.adds2',
+                3 => 'join.adds3',
+                4 => 'join.adds4',
+            );
+            
+            $gameSessionAdd_number  = array(
+                1 => 'join.add_number1',
+                2 => 'join.adds_number2',
+                3 => 'join.adds_number3',
+                4 => 'join.adds_number4',
+            );
+            
+            $adds = session()->get($gameSessionAdd[$game->id], 0);
+            $adds_number = session()->get($gameSessionAdd[$game->id], 0);
+        }
+    }
+    // public function ShowAdvertisement(Request $request)
+    // {
+    //     if (Auth::user()) {
+    //         $game = Games::findOrFail($request->game_id);
+    
+    
+    //         if ($game->status) {
+    //             $data = [];
+    
+    //             $data['user'] = Auth::user();
+    //             $gameSession  = array(
+    //                 1 => 'join.attempts1',
+    //                 2 => 'join.attempts2',
+    //                 3 => 'join.attempts3',
+    //                 4 => 'join.attempts4',
+    //             );
+    
+    //             $gameSessionAdd  = array(
+    //                 1 => 'join.adds1',
+    //                 2 => 'join.adds2',
+    //                 3 => 'join.adds3',
+    //                 4 => 'join.adds4',
+    //             );
+    //             // $data['Points'] = UserPoints::where('user_id' ,"=",Auth::user()->id)->get();
+    
+    //             // if($data['Points']->isEmpty() )
+    //             //   $data['Points'] = 0;
+    //             // else
+    //             //  $data['Points'] = $data['Points'][0]->points;
+    
+    //             $attempts = session()->get($gameSession[$game->id], 0);
+    
+    
+    //             $data['Points'] = $attempts;
+    
+    //             $adds = session()->get($gameSessionAdd[$game->id], 0);
+    //             $data['attempts_max'] = $game->attributes->attempts;
+    
+    //             if ($attempts >= $game->attributes->attempts) {
+    //                 if ($adds >= $game->attributes->ads_count) {
+    //                     $data['can_view_adds'] = false;
+    //                     $data['can_join_game'] = false;
+    //                     return response()->json([$data, 'msg' => 'لقد تجاوزت الحد الاعلى للمحاولات .. حاول غدا '], 401);
+    //                 }
+    
+    //                 $data['can_view_adds'] = true;
+    //                 $data['can_join_game'] = false;
+    
+    //                 session()->put('join.adds', $adds - 1);
+    //                 if ($game->id == 2)
+    //                     $data['questions'] = Questions::where('status', 1)->with('answers')->get();
+    
+    //                 return response()->json([$data], 200);
+    //             }
+    
+    //             session()->put($gameSession[$game->id], $attempts - 1);
+    
+    //             $data['can_view_adds'] = true;
+    //             $data['can_join_game'] = true;
+    //             if ($game->id == 2)
+    //                 $data['questions'] = Questions::where('status', 1)->with('answers')->get();
+    //             return response()->json([$data], 200);
+    //         }
+    //     }
+    
+    
+    //     session()->put('join.adds', $adds + 1);
+    // }
+    
+    
     public function viewAdds(Request $request)
     {
         // sdfgdsf sdgfsdfg sdfgsdfgsd sdfgsdfgsdf sdfgsdfg
-        if(Auth::user()) {
+        if (Auth::user()) {
             // want parameter from mobile to insure validations (if user complete the adds )
-            session()->put('join.attempts',0);
-
-            return response()->json(['msg'=>'لقد حصلت على محاولات اضافية'], 200);
-
+            session()->put('join.attempts', 0);
+            
+            return response()->json(['msg' => 'لقد حصلت على محاولات اضافية'], 200);
         }
     }
-
+    
     public function getAnswer(Request $request)
     {
-        if(Auth::user()) {
-
+        if (Auth::user()) {
+            
             $game = GameAttribute::where('game_id', $request->game_id)->first();
-
-            if($game){
-                $game_points = $game->points_per_try ;
-
-                $is_correct = $request->is_correct ;
-
-                $user_points = \App\UserPoints::updateOrCreate([
-                    'user_id'   => Auth::user()->id,
+            
+            if ($game) {
+                $game_points = $game->points_per_try;
+                
+                $is_correct = $request->is_correct;
+                
+                $user_points = \App\UserPoints::updateOrCreate(
+                    [
+                        'user_id'   => Auth::user()->id,
                     ],
                     [
-                        'game_id'=>0,
-                        'points'=>Auth::user()->user_points ? Auth::user()->points :0,
+                        'game_id' => 0,
+                        'points' => Auth::user()->user_points ? Auth::user()->points : 0,
                     ]
-                );
-
-                if($is_correct) {
+                    );
+                
+                if ($is_correct == true) {
                     $user_points->increment('points', $game_points);
-                    $user_points->save() ;
-
-                     return response()->json(['points'=>$user_points->points,'status'=>true], 200);
-                }
-                else {
-
-                    if( $user_points->points <=  $game_points ) {
-                        $user_points->points = 0 ;
+                    $user_points->save();
+                    
+                    return response()->json(['points' => $user_points->points, 'status' => true], 200);
+                } else {
+                    
+                    if ($user_points->points <=  $game_points) {
+                        $user_points->points = 0;
                         $user_points->save();
-
-                        return response()->json(['points'=>$user_points->points,'status'=>true], 200);
-                    }
-                    else
-                    {
-
-                        $user_points->decrement('points', $game_points);
-                        $user_points->save();
-
-                        return response()->json(['points'=>$user_points->points,'status'=>true], 200);
-
+                        
+                        return response()->json(['points' => $user_points->points, 'status' => true], 200);
+                    } else {
+                        
+                        // $user_points->decrement('points', $game_points);
+                        // $user_points->save();
+                        
+                        return response()->json(['points' => $user_points->points, 'status' => true], 200);
                     }
                 }
-           }
-        return response()->json(['msg'=>'game not found'], 401);
-
+            }
+            return response()->json(['msg' => 'game not found'], 401);
         }
-        return response()->json(['msg'=>'not auth'], 401);
-
+        return response()->json(['msg' => 'not auth'], 401);
     }
-
+    
     public function WheelOfFortune(Request $request)
     {
-        if(Auth::user()) {
+        if (Auth::user()) {
             $game = GameAttribute::where('game_id', $request->game_id)->first();
             // dd($game);
-            if($game){
-                $user_points = \App\UserPoints::updateOrCreate([
-                    'user_id'   => Auth::user()->id,
+            if ($game) {
+                $user_points = \App\UserPoints::updateOrCreate(
+                    [
+                        'user_id'   => Auth::user()->id,
                     ],
                     [
-                        'game_id'=>0,
-                        'points'=>Auth::user()->user_points ? Auth::user()->points :0,
+                        'game_id' => 0,
+                        'points' => Auth::user()->user_points ? Auth::user()->points : 0,
                     ]
-                );
-
-                if($request->value < 10){
-
-                    $game_points = $game->points_per_try * $request->value ;
-                    $user_points->increment('points', $game_points);
-
-                    $user_points->save();
-
-                    return response()->json(['points'=>$user_points->points,'status'=>true], 200);
-                }
-
+                    );
+                
+                
+                
                 $user_points->increment('points', $request->value);
-
+                
                 $user_points->save();
-
-                return response()->json(['points'=>$user_points->points,'status'=>true], 200);
+                
+                return response()->json(['points' => $user_points->points, 'status' => true], 200);
             }
-
-        return response()->json(['msg'=>'game not found'], 401);
+            
+            return response()->json(['msg' => 'game not found'], 401);
         }
-    return response()->json(['msg'=>'not auth'], 401);
+        return response()->json(['msg' => 'not auth'], 401);
     }
-
+    
     public function slotMachine(Request $request)
     {
-        if(Auth::user()) {
+        if (Auth::user()) {
             $game = GameAttribute::where('game_id', $request->game_id)->first();
-            if($game){
-                $user_points = \App\UserPoints::updateOrCreate([
-                    'user_id'   => Auth::user()->id,
+            if ($game) {
+                $user_points = \App\UserPoints::updateOrCreate(
+                    [
+                        'user_id'   => Auth::user()->id,
                     ],
                     [
-                        'game_id'=>0,
-                        'points'=>Auth::user()->user_points ? Auth::user()->points :0,
+                        'game_id' => 0,
+                        'points' => Auth::user()->user_points ? Auth::user()->points : 0,
                     ]
-                );
-
-                if($request->is_match){
-
+                    );
+                
+                
+                if ($request->is_match == true) {
                     $game_points = $game->points_per_try;
                     $user_points->increment('points', $game_points);
-
+                    
                     $user_points->save();
-
-                    return response()->json(['points'=>$user_points->points,'status'=>true], 200);
+                    
+                    return response()->json(['points' => $user_points->points, 'status' => true], 200);
                 }
-
-                return response()->json(['points'=>$user_points->points,'status'=>true], 200);
+                
+                return response()->json(['points' => $user_points->points, 'status' => true], 200);
             }
-
-        return response()->json(['msg'=>'game not found'], 401);
+            
+            return response()->json(['msg' => 'game not found'], 401);
         }
-    return response()->json(['msg'=>'not auth'], 401);
+        return response()->json(['msg' => 'not auth'], 401);
     }
-
-
 }
