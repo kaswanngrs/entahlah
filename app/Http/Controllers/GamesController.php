@@ -96,9 +96,15 @@ class GamesController extends Controller
     {
 
         if (Auth::user()) {
+
             $data['UserPoints'] =  UserPoints::where("user_id", "=", Auth::user()->id)->get();
+         
+            if($data['UserPoints']->count() == 0)
+                $data['UserPoints'] = array('points'=> 0 );
             return response()->json([$data], 201);
-        }
+        }else
+          return response()->json(["unauthorize"], 401);
+
     }
     /**
      * Remove the specified resource from storage.
