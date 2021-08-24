@@ -33,6 +33,7 @@ Route::group(['middleware' => 'auth:api','prefix'=>'auth'], function(){
     Route::post('referral_code','GamesController@referral')->name('game.referral');
     Route::get('referral/{code}','GamesController@referralLink');
     Route::get('showReferral','GamesController@show_referral');
+    Route::get('TotalPoint','GamesController@TotalPoint')->name('game.TotalPoint');
 
     Route::get('Task','TaskController@show');
     Route::get('showTask','TaskController@indexApi');
