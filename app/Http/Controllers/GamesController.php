@@ -146,6 +146,9 @@ class GamesController extends Controller
 
             $User = User::where('referral_code', '=', $code)->first();
 
+            if ($User ===  null) 
+            return response()->json([$User, 'msg' => 'is not match '], 401);
+
             if ($User->id == Auth::user()->id)
                return view("referralLink",["Worning"=>"you can\'t use code" ] );   
 
@@ -155,7 +158,7 @@ class GamesController extends Controller
             return view("referralLink",["Worning"=>"this code is invalid" ] );   
 
 
-            if ($User !==  null) {
+       
 
                 $user_points = \App\UserPoints::updateOrCreate(
                     [
@@ -170,12 +173,11 @@ class GamesController extends Controller
                 $User->increment('visit_code',1);
                 $user_points->increment('points', 10);
                 $user_points->save();
+                $User->Residual = 10 - $User->visit_code ;
                 unset($User->user_points);
                 return view("referralLink",["User"=>$User, "points" => $user_points->points] );   
 
-            }else{
-                return view("referralLink",["Worning"=>"s not match" ] );   
-            }
+       
         }
     }
     public function referral(Request $request)
@@ -191,8 +193,12 @@ class GamesController extends Controller
 
             if ($validator->fails())
                 return response()->json([$validator->errors()->first()], 401);
+     
 
             $User = User::where('referral_code', '=', $request->code)->first();
+
+            if ($User ===  null) 
+               return response()->json([$User, 'msg' => 'is not match '], 401);
 
             if ($User->id == Auth::user()->id)
                 return response()->json(['msg' => 'you can\'t use code '], 401);
@@ -201,7 +207,7 @@ class GamesController extends Controller
             if($User->visit_code >= 10)     
               return response()->json(['msg' => 'this code is invalid '], 401);
 
-            if ($User !==  null) {
+     
 
                 $user_points = \App\UserPoints::updateOrCreate(
                     [
@@ -216,12 +222,10 @@ class GamesController extends Controller
                 $User->increment('visit_code',1);
                 $user_points->increment('points', 10);
                 $user_points->save();
+                $User->Residual = 10 - $User->visit_code ;
                 unset($User->user_points);
-                return response()->json([$User, 'link'=>'http://192.168.100.49/saydaostora/public/api/auth/referral/'.$User->referral_code ,"points" => $user_points->points, 'msg' => 'is exiest,  you have a new 10 points'], 201);
-            } else {
+                return response()->json([$User, 'link'=>url().'/referral/'.$User->referral_code ,"points" => $user_points->points, 'msg' => 'is exiest,  you have a new 10 points'], 201);
 
-                return response()->json([$User, 'msg' => 'is not match '], 401);
-            }
         }
     }
    public function  show_referral(){
