@@ -41,7 +41,14 @@ Route::middleware(['admin'])->group(function () {
     Route::post('/games/delete/{id}','GamesController@destroy')->name('games.delete');
     Route::post('/games/update/{id}','GamesController@update')->name('games.update');
     Route::post('/games/update-attributes/{id}','GamesController@updateAttributes')->name('games.updateAttributes');
+    Route::get('/games/update-attributes/{id}','GamesController@updateAttributes')->name('games.updateAttributes');
+
+    Route::get('/task/create','TaskController@create');
+    Route::post('/task/store','TaskController@store');
 
 });
+
+
+
 Route::view('/', 'auth.login');
 

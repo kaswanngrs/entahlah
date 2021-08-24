@@ -30,5 +30,15 @@ Route::group(['middleware' => 'auth:api','prefix'=>'auth'], function(){
     Route::post('get-answer','GamesController@getAnswer')->name('game.get-answer');
     Route::post('wheel-of-fortune','GamesController@WheelOfFortune')->name('game.WheelOfFortune');
     Route::post('slot-machine','GamesController@slotMachine')->name('game.slotMachine');
+    Route::post('referral_code','GamesController@referral')->name('game.referral');
+    Route::get('referral/{code}','GamesController@referralLink');
+    Route::get('showReferral','GamesController@show_referral');
 
+    Route::get('Task','TaskController@show');
+    Route::get('showTask','TaskController@indexApi');
+
+    Route::get('ShowLink/{id}','TaskController@ShowLink');
+
+
+    
 });
