@@ -12,6 +12,7 @@ use App\UserPoints;
 use App\User;
 use function PHPUnit\Framework\isEmpty;
 use Validator;
+use Illuminate\Support\Facades\Storage;
 
 class GamesController extends Controller
 {
@@ -224,17 +225,17 @@ class GamesController extends Controller
                 $user_points->save();
                 $User->Residual = 10 - $User->visit_code ;
                 unset($User->user_points);
-                return response()->json([$User, 'link'=>url().'/referral/'.$User->referral_code ,"points" => $user_points->points, 'msg' => 'is exiest,  you have a new 10 points'], 201);
+                return response()->json([$User, 'link'=> url().'/api/auth/referral/'.$User->referral_code ,"points" => $user_points->points, 'msg' => 'is exiest,  you have a new 10 points'], 201);
 
         }
     }
    public function  show_referral(){
     if (Auth::user()) {
 
-        $DuePoints = (10 - Auth::user()->visit_code)*10 ;
+        $DuePoints = (10 - Auth::user()->visit_code) * 10 ;
         $EarnedPoints =  Auth::user()->visit_code * 10 ;
 
-        return response()->json([Auth::user(), 'link'=>'http://192.168.100.49/saydaostora/public/api/auth/referral/'.Auth::user()->referral_code,'DuePoints'=>$DuePoints,'EarnedPoints'=>$EarnedPoints], 201);
+        return response()->json([Auth::user(), 'link'=> url().'/api/auth/referral/'.Auth::user()->referral_code,'DuePoints'=>$DuePoints,'EarnedPoints'=>$EarnedPoints], 201);
 
     }
 

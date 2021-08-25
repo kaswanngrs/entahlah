@@ -3,11 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Task;
-use App\UserPoints;
-use Illuminate\Support\Facades\Auth;
+use App\awards;
+use Validator;
+use Illuminate\Support\Facades\Storage;
 
-class TaskController extends Controller
+
+class AwardsController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,53 +18,15 @@ class TaskController extends Controller
     public function index()
     {
         //
-    }
 
-    /**
-     * Display a listing of the resource. use api  this function get all task  and create new link 
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function indexApi()
-    {
-        //
-      $Task = Task ::all();
-      $arrayTask  =array();
-      foreach ($Task  as $task){
-        
-
-        $arrayTask[] =  url('').'/api/auth/ShowLink/'.$task->id; 
-
-      }
-      return response()->json([$arrayTask],200);
+       
 
     }
     
 
-
-    public function ShowLink($id)
-    {
-        //
-        
-        $Task = Task ::find($id);
- 
-        if($Task == null )
-            return response()->json(["msg" => "you have error "],401);
-        
-               $user_points = \App\UserPoints::updateOrCreate(
-                [
-                    'user_id'   => Auth::user()->id,
-                ],
-                [
-                    'game_id' => 0,
-                    'points' => Auth::user()->user_points ? Auth::user()->points : 0,
-                ]
-            );
-            $user_points->increment('points', 15);
-            $user_points->save();
-        return  redirect()->away($Task->Task);
-
-
+    public function  indexApi(){
+        $awards  =awards ::all();
+        return response()->json(["awards"=>$awards], 200);
     }
     /**
      * Show the form for creating a new resource.
@@ -72,9 +35,11 @@ class TaskController extends Controller
      */
     public function create()
     {
-        //
-        return view('admin.task.create');
+        // 'name', 'img', 'point'
 
+        //    $awards = awards ::all();
+
+        return view('admin.awards.create');
     }
 
     /**
@@ -85,9 +50,34 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
-        
         //
-        $Task = Task ::create(["Task" => $request->input('Task')]) ;  
+        $rules = [
+            'name' => ['required', 'string', 'max:255'],
+            'img' => ['required'],
+            'point' => ['required'],
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails())
+            return response()->json([$validator->errors()->first()], 401);
+
+        $data = $request->all();
+        $data['point'] =  (int) $request->input('point');
+
+        if (!empty($request->file('img'))) {
+
+            $file = $request->file('img');
+            $file_name = time() . '.' . $file->getClientOriginalExtension();
+            $destinationPath = $file->storeAs('public/', $file_name);
+            $data['img'] =  Storage::disk('local')->url($file_name);
+            
+        }else {
+            $data['imag'] = null;
+        }
+
+        $awards = awards::create($data);
+
         return back();
     }
 
@@ -100,8 +90,6 @@ class TaskController extends Controller
     public function show($id)
     {
         //
-       
-        
     }
 
     /**
@@ -112,7 +100,7 @@ class TaskController extends Controller
      */
     public function edit($id)
     {
-        // 
+        //
     }
 
     /**
