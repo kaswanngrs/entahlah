@@ -5,7 +5,7 @@
     <div class="container">
         <div class="row">
             <h3 style="padding: 10px">Games attributes</h3>
-            <table class="table table-striped">
+            <table class="table table-striped" id="Games">
                 <thead>
                     <tr>
                         <th scope="col">#</th>
@@ -53,4 +53,7 @@
 
     </div>
 
+
+ 
+    
 @endsection

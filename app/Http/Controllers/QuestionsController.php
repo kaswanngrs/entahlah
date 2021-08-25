@@ -36,7 +36,28 @@ class QuestionsController extends Controller
             return view('admin.questions.index',['questions'=>$data]);
 
     }
+   
 
+    public function indexApi()
+    {
+
+        $questions = Questions::all();
+        if($questions){
+            $data = [] ;
+            foreach ($questions as $question) {
+                $data [] = [
+                    'question_id'=>$question->id,
+                    'question_title'=>$question->question,
+                    'question_correct_answer'=>$question->correct_answer,
+                    'question_status'=>$question->status ? 'Active' : 'Not Active',
+                ];
+            }
+        }
+        return response()->json(["questions"=>  $data ], 202);
+
+
+
+    }
     /**
      * Show the form for creating a new resource.
      *

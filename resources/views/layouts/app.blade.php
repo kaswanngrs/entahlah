@@ -24,6 +24,8 @@
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="{{ asset('dashbord/style.css') }}" rel="stylesheet">
 
+
+    
 </head>
 <body>
 

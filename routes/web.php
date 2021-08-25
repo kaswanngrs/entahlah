@@ -45,6 +45,9 @@ Route::middleware(['admin'])->group(function () {
 
     Route::get('/task/create','TaskController@create');
     Route::post('/task/store','TaskController@store');
+    Route::get('/awards/create','AwardsController@create');
+    Route::post('/awards/store','AwardsController@store');
+
 
 });
 

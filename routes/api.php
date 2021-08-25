@@ -40,6 +40,12 @@ Route::group(['middleware' => 'auth:api','prefix'=>'auth'], function(){
 
     Route::get('ShowLink/{id}','TaskController@ShowLink');
 
+    Route::get('Awards/show','AwardsController@indexApi');
+    Route::get('Questions','QuestionsController@indexApi');
 
     
+    Route::post('Winer/add','WinerController@storeApi');
+
+    
+
 });
