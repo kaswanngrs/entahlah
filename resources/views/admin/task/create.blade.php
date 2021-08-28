@@ -4,7 +4,7 @@
 
     <div class="container">
       
-        <h1 style="color: white; overflow: hidden; text-align: center">Create Task</h1>
+        <h1 style=" overflow: hidden; text-align: center;color :rgb(130 138 146) !important" >Create Task</h1>
         <form action="{{url('/task/store')}}" method="post"> 
             @csrf
             <div class="row align-items-center">

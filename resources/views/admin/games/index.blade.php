@@ -4,7 +4,7 @@
 
     <div class="container">
         <div class="row">
-            <h3 style="padding: 10px">Games attributes</h3>
+            <h3 style="padding: 10px;color :rgb(130 138 146) !important;">Games attributes</h3>
             <table class="table table-striped" id="Games">
                 <thead>
                     <tr>

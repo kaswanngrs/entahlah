@@ -230,14 +230,14 @@ class GamesController extends Controller
         }
     }
    public function  show_referral(){
-    if (Auth::user()) {
 
-        $DuePoints = (10 - Auth::user()->visit_code) * 10 ;
-        $EarnedPoints =  Auth::user()->visit_code * 10 ;
+        if (Auth::user()) {
 
-        return response()->json([Auth::user(), 'link'=> url().'/api/auth/referral/'.Auth::user()->referral_code,'DuePoints'=>$DuePoints,'EarnedPoints'=>$EarnedPoints], 201);
+            $DuePoints = (10 - Auth::user()->visit_code) * 10 ;
+            $EarnedPoints =  Auth::user()->visit_code * 10 ;
+            return response()->json([Auth::user(), 'link'=> url('/').'/api/auth/referral/'.Auth::user()->referral_code,'DuePoints'=>$DuePoints,'EarnedPoints'=>$EarnedPoints], 201);
 
-    }
+        }
 
    }
     public function joinGame(Request $request)

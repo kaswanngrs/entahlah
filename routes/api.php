@@ -15,6 +15,9 @@ use Illuminate\Http\Request;
 
 Route::post('login', 'API\UserController@login');
 Route::post('register', 'API\UserController@register');
+Route::post('password_resets', 'API\UserController@password_resets');
+Route::post('check_code', 'API\UserController@check_code_Password');
+Route::post('For_Get_Pasword', 'API\UserController@For_Get_Pasword');
 
 // Route::get('x', function(){
 
@@ -39,13 +42,14 @@ Route::group(['middleware' => 'auth:api','prefix'=>'auth'], function(){
     Route::get('showTask','TaskController@indexApi');
 
     Route::get('ShowLink/{id}','TaskController@ShowLink');
+    Route::get('addPointTask','TaskController@addPointTask');
 
+    
     Route::get('Awards/show','AwardsController@indexApi');
     Route::get('Questions','QuestionsController@indexApi');
 
     
     Route::post('Winer/add','WinerController@storeApi');
-
-    
+    Route::get('get_All_Notifcation','notifctionController@getAllNotifcation');
 
 });
