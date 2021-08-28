@@ -32,23 +32,23 @@ class UserController extends Controller
     }
 
 
-    public function For_Get_Pasword(Request $request){
+    public function For_Get_Pasword(Request $request)
+    {
 
         $validator = Validator::make($request->all(), [
-            'email' =>['required'],
+            'email' => ['required'],
             'password'   => ['required', 'string'],
-            'configPass' => ['required', 'string','same:password']
+            'configPass' => ['required', 'string', 'same:password']
         ]);
-        if($validator->fails())     
+        if ($validator->fails())
             return response()->json(['error' => $validator->errors()], 401);
-        
-        $User  =User::where('email','=',$request->input('email'))->first();
-        $User->update([
-                        'password'=>bcrypt( $request->input('password') ) 
-                     ]);  
-        
-        return response()->json(['success' => true,'mesg'=>'success reset password '], 202);
 
+        $User  = User::where('email', '=', $request->input('email'))->first();
+        $User->update([
+            'password' => bcrypt($request->input('password'))
+        ]);
+
+        return response()->json(['success' => true, 'mesg' => 'success reset password '], 202);
     }
 
     public function check_code_Password(Request $request)
@@ -64,7 +64,7 @@ class UserController extends Controller
 
 
         $password_resets = DB::table('password_resets')->where('token', $request->input('code'))->first();
-      
+
         if ($password_resets === null)
             $flag = false;
 
@@ -74,6 +74,7 @@ class UserController extends Controller
             $message = "mcode is  not math";
         return response()->json(['success' =>  $flag, 'mesg' => $message], 200);
     }
+
     public function password_resets(Request $request)
     {
 
@@ -127,38 +128,59 @@ class UserController extends Controller
     }
     public function login()
     {
-        $falg = false;
-        $validator = Validator::make(request()->all(), [
-
-            'token_App' => ['required', 'string'],
-            // 'c_password' => 'required|same:password',
-        ]);
-        if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], 401);
-        }
 
 
-        if (request('social_media') == 0) {
+        try {
+            $falg = false;
+            $validator = Validator::make(request()->all(), [
 
-            if (Auth::attempt(['email' => request('email'), 'password' => request('password')]))
+                'token_App' => ['required', 'string'],
+                // 'c_password' => 'required|same:password',
+            ]);
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()], 401);
+            }
+
+
+            if (request('social_media') == 0) {
+
+                if (Auth::attempt(['email' => request('email'), 'password' => request('password')]))
+                    $falg = true;
+            } else {
                 $falg = true;
-        } else {
-            $falg = true;
-            $user = User::where('email', "=", request('email'))->first();
+                $user = User::where('email', "=", request('email'))->first();
+                if ($user  !==  null)
+                    Auth::loginUsingId($user->id);
+                else {
+                    $input =  request()->all();
+                    $validator = Validator::make( $input, [
+                        'name' => ['required', 'string', 'max:255'],
+                        'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+                        'age' => ['required', 'integer'],
+                        'token_App' => ['required', 'string'],
+                        // 'c_password' => 'required|same:password',
+                    ]);
+                    if ($validator->fails()) {
+                        return response()->json(['error' => $validator->errors()], 401);
+                    }
+                    $input['referral_code'] = Str::random(6);
+                    $user = User::create($input);
+                }
+            }
 
-            Auth::loginUsingId($user->id);
-        }
+            if ($falg) {
+                $user = Auth::user();
+                $User = User::find($user->id);
+                if ($User  !== null)
+                    $User->update(['token_App' => request('token_App')]);
 
-        if ($falg) {
-            $user = Auth::user();
-            $User = User::find($user->id);
-            if ($User  !== null)
-                $User->update(['token_App' => request('token_App')]);
-
-            $success['token'] =  $User->createToken('MyApp')->accessToken;
-            return response()->json(['success' => $success, 'user' => $User], $this->successStatus);
-        } else {
-            return response()->json(['error' => 'Unauthorised'], 401);
+                $success['token'] =  $User->createToken('MyApp')->accessToken;
+                return response()->json(['success' => $success, 'user' => $User], $this->successStatus);
+            } else {
+                return response()->json(['error' => 'Unauthorised'], 401);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e], 401);
         }
     }
     /**

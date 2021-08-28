@@ -30,13 +30,14 @@
     <style>
         .nav-class {
 
-            background-image: linear-gradient(326deg, #cecebf, #c6c1dc, #635e79, #4c4b50);
-            color: #fff;
+            /* background-image: linear-gradient(326deg, #cecebf, #c6c1dc, #635e79, #4c4b50); */
+            color: #000;
+            background: #fff;
         }
 
         body {
 
-            background: #e4e4e4;
+            background-color: #f7fafc;
             font-family: cursive;
         }
 
@@ -65,12 +66,32 @@
         }
 
         #accordian {
-            background-image: linear-gradient(99deg, #e5e5e6, #ffffff, #f9f6f6, #ffffff);
             width: 250px;
             padding: 10px;
             float: left;
             height: 100vh;
-            overflow-x: hidden;
+
+
+            -webkit-animation-duration: 500ms;
+            animation-duration: 500ms;
+
+            -webkit-animation-duration: 1000ms;
+            animation-duration: 1000ms;
+            -webkit-animation-fill-mode: both;
+            animation-fill-mode: both;
+
+            width: 16rem;
+
+            position: relative;
+
+            padding: 1.5rem;
+
+
+            display: flex;
+
+            border-right-width: 1px;
+            background-color: #fff;
+
         }
     </style>
 
@@ -92,10 +113,15 @@
                 <p class="alert alert-success">{{ Session::get('success') }}</p>
                 @endif
             </div>
-            <nav class="navbar navbar-expand-md navbar-light bg-white shadow-lg nav-class " style="">
+            <nav class="navbar navbar-expand-md navbar-light bg-dark shadow-lg nav-class ">
                 <div class="container">
                     <a class="navbar-brand text-white">
-                        Sayd Aostra
+                     
+               
+                            <img src="{{ asset('/icons/logo.png') }}" class="rounded" alt="..." style="width: 5%;">
+                            Sayd Aostra icons
+               
+                
                     </a>
                     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
                         <span class="navbar-toggler-icon"></span>
@@ -108,25 +134,25 @@
                         </ul>
 
                         <!-- Right Side Of Navbar -->
-                        <ul class="navbar-nav ml-auto">
+                        <ul class="navbar-nav ml-auto ">
                             <!-- Authentication Links -->
                             @guest
-                            <li class="nav-item">
+                            <li class="nav-item ">
                                 <a class="nav-link  " href="{{ route('login') }}">{{ __('Login') }}</a>
                             </li>
                             {{-- @if (Route::has('register'))
-                                    <li class="nav-item">
+                                    <li class="nav-item text-white ">
                                         <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
                             </li>
                             @endif --}}
                             @else
                             <li class="nav-item dropdown">
-                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                <a id="navbarDropdown" class="nav-link dropdown-toggle text-white" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     {{ Auth::user()->name }} <span class="caret"></span>
                                 </a>
 
-                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
+                                <div class="dropdown-menu dropdown-menu-right " aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item " href="{{ route('logout') }}" onclick="event.preventDefault();
                                                          document.getElementById('logout-form').submit();">
                                         {{ __('Logout') }}
                                     </a>
@@ -144,9 +170,11 @@
 
         </main>
         @if (!Auth::guest())
+
+
         <div class="row">
 
-            <div id="accordian" class="col-3">
+            <div id="accordian" class="col-3 relative flex flex-col flex-wrap bg-white border-r border-gray-300 p-6 flex-none w-64 md:-ml-64 md:fixed md:top-0 md:z-30 md:h-screen md:shadow-xl animated faster">
                 <ul class="show-dropdown text-left">
                     <li>
                         <a href="{{url('home')}}" class="cool-link"><i class="fas fa-tachometer-alt"></i>Dashboard</a>
