@@ -392,7 +392,7 @@ class GamesController extends Controller
             $gameSession->decrement('try_ads', 1);
         } else {
 
-            if ($gameSession->ads <= $GameAttribute->try_ads)
+            if ($gameSession->ads <= $GameAttribute->ads_count)
                 $data['can_view_adds'] = false;
             $data['can_adds_try'] = false;
             $data['can_join_game'] = false;
