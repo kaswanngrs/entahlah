@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Auth;
 use App\UserPoints;
 // use App\Models\User;
 use App\User;
+use Exception;
+use App\gameSession;
 use function PHPUnit\Framework\isEmpty;
 use Validator;
 use Illuminate\Support\Facades\Storage;
@@ -99,13 +101,12 @@ class GamesController extends Controller
         if (Auth::user()) {
 
             $data['UserPoints'] =  UserPoints::where("user_id", "=", Auth::user()->id)->get();
-         
-            if($data['UserPoints']->count() == 0)
-                $data['UserPoints'] = array('points'=> 0 );
-            return response()->json([$data], 201);
-        }else
-          return response()->json(["unauthorize"], 401);
 
+            if ($data['UserPoints']->count() == 0)
+                $data['UserPoints'] = array('points' => 0);
+            return response()->json([$data], 201);
+        } else
+            return response()->json(["unauthorize"], 401);
     }
     /**
      * Remove the specified resource from storage.
@@ -141,44 +142,43 @@ class GamesController extends Controller
     }
 
 
-    public function referralLink($code){
+    public function referralLink($code)
+    {
 
         if (Auth::user()) {
 
             $User = User::where('referral_code', '=', $code)->first();
 
-            if ($User ===  null) 
-            return response()->json([$User, 'msg' => 'is not match '], 401);
+            if ($User ===  null)
+                return response()->json([$User, 'msg' => 'is not match '], 401);
 
             if ($User->id == Auth::user()->id)
-               return view("referralLink",["Worning"=>"you can\'t use code" ] );   
+                return view("referralLink", ["Worning" => "you can\'t use code"]);
 
 
 
-            if($User->visit_code >= 10)     
-            return view("referralLink",["Worning"=>"this code is invalid" ] );   
+            if ($User->visit_code >= 10)
+                return view("referralLink", ["Worning" => "this code is invalid"]);
 
 
-       
 
-                $user_points = \App\UserPoints::updateOrCreate(
-                    [
-                        'user_id'   => $User->id,
-                    ],
-                    [
-                        'game_id' => 0,
-                        'points' => $User->user_points ? $User->points : 0,
-                    ]
-                );
-                
-                $User->increment('visit_code',1);
-                $user_points->increment('points', 10);
-                $user_points->save();
-                $User->Residual = 10 - $User->visit_code ;
-                unset($User->user_points);
-                return view("referralLink",["User"=>$User, "points" => $user_points->points] );   
 
-       
+            $user_points = \App\UserPoints::updateOrCreate(
+                [
+                    'user_id'   => $User->id,
+                ],
+                [
+                    'game_id' => 0,
+                    'points' => $User->user_points ? $User->points : 0,
+                ]
+            );
+
+            $User->increment('visit_code', 1);
+            $user_points->increment('points', 10);
+            $user_points->save();
+            $User->Residual = 10 - $User->visit_code;
+            unset($User->user_points);
+            return view("referralLink", ["User" => $User, "points" => $user_points->points]);
         }
     }
     public function referral(Request $request)
@@ -194,52 +194,50 @@ class GamesController extends Controller
 
             if ($validator->fails())
                 return response()->json([$validator->errors()->first()], 401);
-     
 
-            $User = User::where('referral_code', '=', $request->code)->first();
 
-            if ($User ===  null) 
-               return response()->json([$User, 'msg' => 'is not match '], 401);
+            $User = User::where('referral_code', '=', $request->input('code'))->first();
+
+            if ($User ===  null)
+                return response()->json([$User, 'msg' => 'is not match '], 401);
 
             if ($User->id == Auth::user()->id)
                 return response()->json(['msg' => 'you can\'t use code '], 401);
 
 
-            if($User->visit_code >= 10)     
-              return response()->json(['msg' => 'this code is invalid '], 401);
+            if ($User->visit_code >= 10)
+                return response()->json(['msg' => 'this code is invalid '], 401);
 
-     
 
-                $user_points = \App\UserPoints::updateOrCreate(
-                    [
-                        'user_id'   => $User->id,
-                    ],
-                    [
-                        'game_id' => 0,
-                        'points' => $User->user_points ? $User->points : 0,
-                    ]
-                );
-                
-                $User->increment('visit_code',1);
-                $user_points->increment('points', 10);
-                $user_points->save();
-                $User->Residual = 10 - $User->visit_code ;
-                unset($User->user_points);
-                return response()->json([$User, 'link'=> url().'/api/auth/referral/'.$User->referral_code ,"points" => $user_points->points, 'msg' => 'is exiest,  you have a new 10 points'], 201);
 
+            $user_points = \App\UserPoints::updateOrCreate(
+                [
+                    'user_id'   => $User->id,
+                ],
+                [
+                    'game_id' => 0,
+                    'points' => $User->user_points ? $User->points : 0,
+                ]
+            );
+
+            $User->increment('visit_code', 1);
+            $user_points->increment('points', 10);
+            $user_points->save();
+            $User->Residual = 10 - $User->visit_code;
+            unset($User->user_points);
+            return response()->json([$User, 'link' => url('/') . '/api/auth/referral/' . $User->referral_code, "points" => $user_points->points, 'msg' => 'is exiest,  you have a new 10 points'], 201);
         }
     }
-   public function  show_referral(){
+    public function  show_referral()
+    {
 
         if (Auth::user()) {
 
-            $DuePoints = (10 - Auth::user()->visit_code) * 10 ;
-            $EarnedPoints =  Auth::user()->visit_code * 10 ;
-            return response()->json([Auth::user(), 'link'=> url('/').'/api/auth/referral/'.Auth::user()->referral_code,'DuePoints'=>$DuePoints,'EarnedPoints'=>$EarnedPoints], 201);
-
+            $DuePoints = (10 - Auth::user()->visit_code) * 10;
+            $EarnedPoints =  Auth::user()->visit_code * 10;
+            return response()->json([Auth::user(), 'link' => url('/') . '/api/auth/referral/' . Auth::user()->referral_code, 'DuePoints' => $DuePoints, 'EarnedPoints' => $EarnedPoints], 201);
         }
-
-   }
+    }
     public function joinGame(Request $request)
     {
         if (Auth::user()) {
@@ -350,6 +348,96 @@ class GamesController extends Controller
         }
     }
 
+
+
+
+
+
+
+    public function  joinGame2(Request  $request)
+    {
+
+        // ["attempts","ads","try_ads","user_id"]
+
+        $User =  Auth::user();
+
+        $game_id = $request->input('game_id');
+        $GameAttribute = GameAttribute::where("game_id", '=', $game_id)->first();
+        if ($GameAttribute  ===  null)
+            return response()->json(["mesg" => "id game does not exist"], 400);
+
+
+        $gameSession = gameSession::where('user_id', "=", $User->id)->where('game_id', '=', $game_id)->first();
+        // = ["attempts","ads","try_ads","user_id","game_id"];
+        if ($gameSession === null)
+            $gameSession =  gameSession::create([
+                'user_id'   => Auth::user()->id,
+                'game_id'  => $game_id,
+                'attempts' => 0
+            ]);
+
+        $try_ads = $gameSession->try_ads;
+
+        $attempts = $gameSession->attempts;
+        $data['can_view_adds'] = true;
+        $data['can_adds_try'] = true;
+        $data['can_join_game'] = true;
+        if ($attempts < $GameAttribute->attempts) {
+
+            $gameSession->increment('attempts', 1);
+        } elseif ($try_ads > 0) {
+
+ 
+            $data['can_join_game'] = false;
+            $gameSession->decrement('try_ads', 1);
+        } else {
+
+            if ($gameSession->ads <= $GameAttribute->try_ads)
+                $data['can_view_adds'] = false;
+            $data['can_adds_try'] = false;
+            $data['can_join_game'] = false;
+        }
+
+
+        $data['attempts_max'] = $GameAttribute->attempts;
+        $data['ads_max'] = $GameAttribute->ads_count;
+        $data['number_add_try_ads'] = $gameSession->try_ads;
+        $data['game_session']  = $gameSession;
+
+
+        return response()->json([$data], 200);
+    }
+
+
+    public function  showAds(Request  $request)
+    {
+        $User =  Auth::user();
+
+        $game_id = $request->input('game_id');
+        $GameAttribute = GameAttribute::where("game_id", '=', $game_id)->first();
+        if ($GameAttribute  ===  null)
+            return response()->json(["mesg" => "id game does not exist"], 400);
+
+
+        $gameSession = gameSession::where('user_id', "=", $User->id)->where('game_id', '=', $game_id)->first();
+        // = ["attempts","ads","try_ads","user_id","game_id"];
+        if ($gameSession === null)
+            $gameSession =  gameSession::create([
+                'user_id'   => Auth::user()->id,
+                'game_id'  => $game_id,
+                'try_ads' => 0,
+                'ads' => 0,
+
+            ]);
+
+        if ($gameSession->ads < $GameAttribute->ads_count) {
+            $gameSession->increment('ads', 1);
+            $gameSession->increment('try_ads', 5);
+            return response()->json(["mesg" => "I got five new tries "], 200);
+        } else 
+            return response()->json(["mesg" => "You have to wait for tomorrow "], 200);
+        
+    }
 
 
     public function adds_show(Request $request)
