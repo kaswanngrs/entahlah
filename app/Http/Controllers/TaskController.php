@@ -50,19 +50,27 @@ class TaskController extends Controller
         if($Task == null )
             return response()->json(["msg" => "you have error "],401);
         
-               $user_points = \App\UserPoints::updateOrCreate(
-                [
-                    'user_id'   => Auth::user()->id,
-                ],
-                [
-                    'game_id' => 0,
-                    'points' => Auth::user()->user_points ? Auth::user()->points : 0,
-                ]
-            );
-            $user_points->increment('points', 15);
-            $user_points->save();
+   
         return  redirect()->away($Task->Task);
 
+
+    }
+
+
+    public function addPointTask(Request $request){
+
+        $user_points = \App\UserPoints::updateOrCreate(
+            [
+                'user_id'   => Auth::user()->id,
+            ],
+            [
+                'game_id' => 0,
+                'points' => Auth::user()->user_points ? Auth::user()->points : 0,
+            ]
+        );
+        $user_points->increment('points', 15);
+        $user_points->save();
+        return response()->json(['task'=>'success Add task point ', 'Add_point'=>true],200);
 
     }
     /**

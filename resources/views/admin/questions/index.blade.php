@@ -4,7 +4,7 @@
 
 <div class="container">
         <div class="row">
-            <h3 style="padding: 10px;">Questions and Answers</h3>
+            <h3 style="color :rgb(130 138 146) !important; overflow: hidden; text-align: cente" >Questions and Answers</h3>
 
             <div style="width: 100%"><a  href="/questions/create" class="btn btn-primary" style="float: right; margin: 4px">Add Question</a></div>
             <table class="table table-striped">

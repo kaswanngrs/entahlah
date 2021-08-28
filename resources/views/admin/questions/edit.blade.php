@@ -1,11 +1,22 @@
 @extends('layouts.app')
 @section('content')
 
+<style>
+
+.answer {
+    width: 81%;
+    background-color: transparent;
+    text-align: center;
+    direction: rtl;
+    margin: auto;
+    padding: 25px 0px;
+    display: inline-block !important;
+    }
+</style>
 
     <div class="container">
         {{-- action="/users/update/{{$user->id}}" method="POST" --}}
         <h1 style="color: white; overflow: hidden; text-align: center">Edit Question</h1>
-
 
         <div class="edit-questions">
             <form id="question-form" method="POST" action="/questions/update/{{$question->id}}" >

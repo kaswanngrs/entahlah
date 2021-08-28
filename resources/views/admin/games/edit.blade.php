@@ -32,6 +32,7 @@
                 </div>
 
             </form>
+                        </div>
                     <div class="advance-option" >
                         <div id="show-hidden-menu">
                             <h3>Advance Options
