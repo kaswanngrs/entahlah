@@ -31,7 +31,7 @@ Route::group(['middleware' => 'auth:api','prefix'=>'auth'], function(){
     Route::post('join-game','GamesController@joinGame')->name('game.join');
     Route::post('joinGame2','GamesController@joinGame2')->name('game.join2');
     Route::post('show_Ads','GamesController@showAds')->name('show.Ads');
-
+    Route::get('GameSession','GamesController@GameSession')->name('GameSession.Ads');
     
     Route::post('view-adds','GamesController@viewAdds')->name('game.view-adds');
     Route::post('get-answer','GamesController@getAnswer')->name('game.get-answer');
