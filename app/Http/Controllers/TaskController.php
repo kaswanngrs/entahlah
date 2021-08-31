@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Task;
 use App\UserPoints;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class TaskController extends Controller
 {
@@ -16,11 +17,13 @@ class TaskController extends Controller
      */
     public function index()
     {
-        //
+        $tasks=Task::get();
+        return view('admin.task.Show',compact('tasks'));
     }
 
+
     /**
-     * Display a listing of the resource. use api  this function get all task  and create new link 
+     * Display a listing of the resource. use api  this function get all task  and create new link
      *
      * @return \Illuminate\Http\Response
      */
@@ -30,27 +33,27 @@ class TaskController extends Controller
       $Task = Task ::all();
       $arrayTask  =array();
       foreach ($Task  as $task){
-        
 
-        $arrayTask[] =  url('').'/api/auth/ShowLink/'.$task->id; 
+
+        $arrayTask[] =  url('').'/api/auth/ShowLink/'.$task->id;
 
       }
       return response()->json([$arrayTask],200);
 
     }
-    
+
 
 
     public function ShowLink($id)
     {
         //
-        
+
         $Task = Task ::find($id);
- 
+
         if($Task == null )
             return response()->json(["msg" => "you have error "],401);
-        
-   
+
+
         return  redirect()->away($Task->Task);
 
 
@@ -93,10 +96,10 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
-        
+
         //
-        $Task = Task ::create(["Task" => $request->input('Task')]) ;  
-        return back();
+        $Task = Task ::create(["Task" => $request->input('Task')]) ;
+        return redirect()->route('show');
     }
 
     /**
@@ -108,8 +111,8 @@ class TaskController extends Controller
     public function show($id)
     {
         //
-       
-        
+
+
     }
 
     /**
@@ -120,7 +123,8 @@ class TaskController extends Controller
      */
     public function edit($id)
     {
-        // 
+        $task=Task::where('id',$id)->first();
+        return view('admin.task.edit',compact('task'));
     }
 
     /**
@@ -132,7 +136,11 @@ class TaskController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+         $this->validate($request, [
+            'task' => 'required']);
+        $input['task'] = $request->task;
+        DB::table('tasks')->where('id','=',$id)->update($input);
+        return redirect()->route('show');
     }
 
     /**
@@ -143,6 +151,8 @@ class TaskController extends Controller
      */
     public function destroy($id)
     {
-        //
+    $tasks = Task::find( $id );
+    $tasks->delete();
+    return back();
     }
 }

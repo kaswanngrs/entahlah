@@ -116,12 +116,12 @@
             <nav class="navbar navbar-expand-md navbar-light bg-dark shadow-lg nav-class ">
                 <div class="container">
                     <a class="navbar-brand text-white">
-                     
-               
+
+
                             <img src="{{ asset('/icons/logo.png') }}" class="rounded" alt="..." style="width: 5%;">
                             Sayd Aostra icons
-               
-                
+
+
                     </a>
                     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
                         <span class="navbar-toggler-icon"></span>
@@ -217,6 +217,9 @@
                             <li><a href="javascript:void(0);">Settings</a></li>
                         </ul> --}}
                     </li>
+
+                    <li><a href="{{ route('show') }}">Tasks</a></li>
+                    <li><a href="{{ route('show.awards') }}">Awards</a></li>
 
 
                     {{-- <li>

@@ -19,6 +19,20 @@
                     </div>
 
                     <div class="col-12">
+                        <label for="">Title:
+                            <input type="text" name="title" id="title" value="{{ $game->name }}" class="form-control"
+                                required>
+                        </label>
+                    </div>
+
+                    <div class="col-12">
+                        <label for="">Title:
+                            <input type="text" name="title" id="title" value="{{ $game->name }}" class="form-control"
+                                required>
+                        </label>
+                    </div>
+
+                    <div class="col-12">
                         <label for="">Status:
                             <select name="status" id="status" class="form-control" required>
                                 <option value="0" {{ $game->status ? '' : 'selected' }}>Not Active</option>
