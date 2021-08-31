@@ -11,7 +11,8 @@
 |
 */
 
-
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
 Auth::routes();
 
@@ -53,6 +54,6 @@ Route::middleware(['admin'])->group(function () {
 });
 
 
-
+Route::get('privacyploicy','PrivacyPolicyController@index');
 Route::view('/', 'auth.login');
 
