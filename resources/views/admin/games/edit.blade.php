@@ -18,19 +18,7 @@
                         </label>
                     </div>
 
-                    <div class="col-12">
-                        <label for="">Title:
-                            <input type="text" name="title" id="title" value="{{ $game->name }}" class="form-control"
-                                required>
-                        </label>
-                    </div>
 
-                    <div class="col-12">
-                        <label for="">Title:
-                            <input type="text" name="title" id="title" value="{{ $game->name }}" class="form-control"
-                                required>
-                        </label>
-                    </div>
 
                     <div class="col-12">
                         <label for="">Status:

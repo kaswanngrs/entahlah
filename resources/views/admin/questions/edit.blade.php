@@ -16,9 +16,9 @@
 
     <div class="container">
         {{-- action="/users/update/{{$user->id}}" method="POST" --}}
-        <h1 style="color: white; overflow: hidden; text-align: center">Edit Question</h1>
-
-        <div class="edit-questions">
+        <center>  <h1 style="color: white; overflow: hidden; text-align: center">Edit Question</h1></center>
+<center>
+        <div class=" container edit-questions row answer" style="margin-right: 23%;">
             <form id="question-form" method="POST" action="/questions/update/{{$question->id}}" >
                 @csrf
                 <div class="step-one row">
@@ -55,6 +55,8 @@
 
             </form>
         </div>
+</center>
+
         @php
             $i = 1;
         @endphp

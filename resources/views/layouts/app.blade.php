@@ -218,8 +218,15 @@
                         </ul> --}}
                     </li>
 
-                    <li><a href="{{ route('show') }}">Tasks</a></li>
-                    <li><a href="{{ route('show.awards') }}">Awards</a></li>
+
+                    <li>
+                        <a href="{{ route('show') }}" class="cool-link"><i class="far fa-address-book"></i>Tasks</a>
+                    </li>
+
+                    <li>
+                        <a href="{{ route('show.awards') }}" class="cool-link"><i class="far fa-address-book"></i>Awards</a>
+                    </li>
+
 
 
                     {{-- <li>

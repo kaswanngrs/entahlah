@@ -71,10 +71,11 @@ class GamesController extends Controller
     public function edit(Request $request, $id)
     {
         $game = Games::findOrFail($id);
-        if ($game) {
-
-            return view('admin.games.edit', ['game' => $game]);
-        }
+        $gamesattribut=GameAttribute::find($id);
+        return view('admin.games.edit',compact('game','gamesattribut'));
+        // if ($game) {
+        //     return view('admin.games.edit', ['game' => $game]);
+        // }
     }
 
     /**
