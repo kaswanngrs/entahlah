@@ -54,6 +54,6 @@ Route::middleware(['admin'])->group(function () {
 });
 
 
-Route::get('privacyploicy','PrivacyPolicyController@index');
+Route::get('privacyploicy.html','PrivacyPolicyController@index');
 Route::view('/', 'auth.login');
 
