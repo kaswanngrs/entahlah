@@ -169,11 +169,9 @@
             </nav>
 
         </main>
-        @if (!Auth::guest())
-
-
+        {{-- @if (!Auth::guest()) --}}
+        @auth
         <div class="row">
-
             <div id="accordian" class="col-3 relative flex flex-col flex-wrap bg-white border-r border-gray-300 p-6 flex-none w-64 md:-ml-64 md:fixed md:top-0 md:z-30 md:h-screen md:shadow-xl animated faster">
                 <ul class="show-dropdown text-left">
                     <li>
@@ -226,9 +224,6 @@
                     <li>
                         <a href="{{ route('show.awards') }}" class="cool-link"><i class="far fa-address-book"></i>Awards</a>
                     </li>
-
-
-
                     {{-- <li>
                         <a href="javascript:void(0);"><i class="far fa-clone"></i>Components</a>
                         <ul class="show-dropdown">
@@ -314,16 +309,12 @@
                     <li>
                         <a href="javascript:void(0);"><i class="far fa-heart"></i>Favorite</a>
                     </li> --}}
-
                 </ul>
-
             </div>
-            @endif
-
-
+            {{-- @endif --}}
+            @endauth
             <div class=" col-9 ">
                 @yield('content')
-
             </div>
         </div>
     </div>

@@ -7,6 +7,7 @@
       <p class="alert alert-danger">{{ Session::get('error') }}</p>
       @endif
   </div>
+  @guest
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -76,4 +77,5 @@
         </div>
     </div>
 </div>
+@endguest
 @endsection
