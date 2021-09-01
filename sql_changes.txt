@@ -22,3 +22,5 @@ CHANGE COLUMN `points-per-try` `points_per_try` INT(10) UNSIGNED NOT NULL ;
 
 ALTER TABLE `tasks` ADD `deleted_at` TIMESTAMP NULL AFTER `updated_at`;
 ALTER TABLE `awards` ADD `deleted_at` TIMESTAMP NULL AFTER `updated_at`;
+-------------------
+ALTER TABLE `game_sessions` CHANGE `usetryads` `usetryads` INT(11) NOT NULL;

@@ -71,8 +71,8 @@ class GamesController extends Controller
     public function edit(Request $request, $id)
     {
         $game = Games::findOrFail($id);
-        $gamesattribut=GameAttribute::find($id);
-        return view('admin.games.edit',compact('game','gamesattribut'));
+        $gamesattribut = GameAttribute::find($id);
+        return view('admin.games.edit', compact('game', 'gamesattribut'));
         // if ($game) {
         //     return view('admin.games.edit', ['game' => $game]);
         // }
@@ -349,37 +349,63 @@ class GamesController extends Controller
         }
     }
 
- public function showattent(Request $request)
- {
-    $user =  Auth::user()->id;
-    $game_id = $request->game_id;
-    $GameAttribute = GameAttribute::where("game_id", $game_id)->first();
-    if (!$GameAttribute){
-    return response()->json(["mesg" => "id game does not exist"], 200);
-    }
-    $gameSession = gameSession::where('user_id',$user)->where('game_id', $game_id)->first();
-    // return $gameSession;
-    if(!$gameSession)
+    public function showattent(Request $request)
     {
-        // return response()->json(["mesg" => "Not Game"], 400);
-        // $data['attempts_max'] = $GameAttribute->attempts;
-        //  $data['ads_max'] = $GameAttribute->ads_count;
-        //  $data['points_per_try']=$GameAttribute->ads_count;
-        //  $data['game_id']=$GameAttribute->ads_count;
+        $user = Auth::user()->id;
+        $game_id = $request->game_id;
+        $gameattribute = GameAttribute::where("game_id", $game_id)->first();
+        $gamesession = gameSession::where('user_id', $user)->where('game_id', $game_id)->first();
+        $data['can_view_adds'] = true;
+        $data['can_adds_try'] = true;
+        $data['can_join_game'] = true;
+        if (!$gameattribute) {
+            return response()->json(["mesg" => "id game does not exist"], 200);
+        } elseif (!$gamesession) {
+            $data['gamesession']['attempts'] = 0;
+            $data['gamesession']['ads'] = 0;
+            $data['gamesession']['try_ads'] = 0;
+            $data['gamesession']['game_id'] = $gameattribute->game_id;
+            $data['gamesession']['user_id '] = Auth::user()->id;
+            $data['gameattribute']  = $gameattribute;
+            return response()->json(['data' => $data], 200);
+        }
 
-        $data['gameSession']['attempts'] =0;
-        $data['gameSession']['ads'] = 0;
-
-        $data['gameSession']['try_ads'] =0;
-        $data['gameSession']['game_id'] = $GameAttribute->game_id;
-        $data['gameSession']['user_id '] =Auth::user()->id;
-        $data['GameAttribute']  = $GameAttribute;
-        return response()->json(['data'=>$data],200);
+        if ($gamesession->ads >= $gameattribute->ads_count) {
+            $data['can_view_adds'] = false;
+            return response()->json(['data' => $data], 200);
+        }
+     else{
+            if($gamesession->attempts<=$gameattribute->attempts)
+            {
+                $gamesession->increment('attempts',1);
+                $data['can_view_adds'] = true;
+                $data['can_adds_try'] = true;
+                $data['can_join_game'] = true;
+                return response()->json(['data' => $data], 200);
+            }
+            else
+            {
+                $data['can_join_game'] = false;
+            }
+            if($gamesession->usetryads <= $gamesession->try_ads)
+            {
+                $gamesession->increment('usetryads',1);
+                $data['can_view_adds'] = true;
+                $data['can_adds_try']  = true;
+                $data['can_join_game'] = true;
+                return response()->json(['useTryAds'=>$data],200);
+            }
+            else
+            {
+                $data['can_view_adds'] = true;
+                $data['can_adds_try'] = false;
+                $data['can_join_game'] = true;
+            }
+        }
+            $game['gameattribute'] = $gameattribute;
+            $game['gamesession'] = $gamesession;
+            return response()->json(['data' => $game], 200);
     }
-    $game['gameAttribute']=$GameAttribute;
-    $game['gameSession']=$gameSession;
-return response()->json(['data'=>$game],200);
- }
 
     public function  joinGame2(Request  $request)
     {
@@ -470,22 +496,21 @@ return response()->json(['data'=>$game],200);
 
 
     public function  GameSession(Request $request)
-     {
+    {
         $User = Auth::user();
         $game_id = $request->input('game_id');
-        $GameAttribute = GameAttribute::where('game_id','=', $game_id);
+        $GameAttribute = GameAttribute::where('game_id', '=', $game_id);
 
         if ($GameAttribute  ===  null)
-        return response()->json(["mesg" => "id game does not exist"], 400);
+            return response()->json(["mesg" => "id game does not exist"], 400);
 
-         $gameSession = gameSession::where('user_id', "=", $User->id)->where('game_id', '=', $game_id)->first();
+        $gameSession = gameSession::where('user_id', "=", $User->id)->where('game_id', '=', $game_id)->first();
 
-         $data['attempts_max'] = $GameAttribute->attempts;
-         $data['ads_max'] = $GameAttribute->ads_count;
-         $data['number_add_try_ads'] = $gameSession->try_ads;
-         $data['game_session']  = $gameSession;
-         return response()->json([$data], 200);
-
+        $data['attempts_max'] = $GameAttribute->attempts;
+        $data['ads_max'] = $GameAttribute->ads_count;
+        $data['number_add_try_ads'] = $gameSession->try_ads;
+        $data['game_session']  = $gameSession;
+        return response()->json([$data], 200);
     }
 
 
