@@ -370,41 +370,20 @@ class GamesController extends Controller
             return response()->json(['data' => $data], 200);
         }
 
-        if ($gamesession->ads >= $gameattribute->ads_count) {
-            $data['can_view_adds'] = false;
-            return response()->json(['data' => $data], 200);
-        }
-     else{
-            if($gamesession->attempts<=$gameattribute->attempts)
-            {
-                $gamesession->increment('attempts',1);
-                $data['can_view_adds'] = true;
-                $data['can_adds_try'] = true;
-                $data['can_join_game'] = true;
-                return response()->json(['data' => $data], 200);
-            }
-            else
-            {
-                $data['can_join_game'] = false;
-            }
-            if($gamesession->usetryads <= $gamesession->try_ads)
-            {
-                $gamesession->increment('usetryads',1);
-                $data['can_view_adds'] = true;
-                $data['can_adds_try']  = true;
-                $data['can_join_game'] = true;
-                return response()->json(['useTryAds'=>$data],200);
-            }
-            else
-            {
-                $data['can_view_adds'] = true;
-                $data['can_adds_try'] = false;
-                $data['can_join_game'] = true;
-            }
-        }
-            $game['gameattribute'] = $gameattribute;
-            $game['gamesession'] = $gamesession;
-            return response()->json(['data' => $game], 200);
+
+        $try_ads = $gamesession->try_ads;
+
+        $attempts = $gamesession->attempts;
+
+        $data['can_join_game'] = ($attempts >= $gameattribute->attempts) ? false : true;
+        $data['can_adds_try'] = ($gamesession->usetryads >= $gamesession->try_ads) ? false : true;
+        $data['can_view_adds'] = ($gamesession->ads <= $gameattribute->ads_count) ? false : true;
+        $data['attempts_max'] = $gameattribute->attempts;
+        $data['ads_max'] = $gameattribute->ads_count;
+
+        $data['number_add_try_ads'] = $gamesession->try_ads - $gamesession->usetryads;
+        $data['game_session']  = $gamesession;
+        return response()->json(['data' => $data], 200);
     }
 
     public function  joinGame2(Request  $request)
@@ -413,8 +392,6 @@ class GamesController extends Controller
         // ["attempts","ads","try_ads","user_id"]
 
         $User =  Auth::user();
-
-
         $game_id = $request->input('game_id');
         $GameAttribute = GameAttribute::where("game_id", '=', $game_id)->first();
         if ($GameAttribute  ===  null)
@@ -437,19 +414,17 @@ class GamesController extends Controller
         $data['can_adds_try'] = true;
         $data['can_join_game'] = true;
         if ($attempts < $GameAttribute->attempts) {
-
             $gameSession->increment('attempts', 1);
         } elseif ($try_ads > 0) {
-
-
             $data['can_join_game'] = false;
-            $gameSession->decrement('try_ads', 1);
+            $gameSession->increment('usetryads', 1);
         } else {
 
             if ($gameSession->ads <= $GameAttribute->ads_count)
                 $data['can_view_adds'] = false;
-            $data['can_adds_try'] = false;
-            $data['can_join_game'] = false;
+
+                $data['can_adds_try'] = false;
+                $data['can_join_game'] = false;
         }
 
 
@@ -487,6 +462,7 @@ class GamesController extends Controller
         if ($gameSession->ads < $GameAttribute->ads_count) {
             $gameSession->increment('ads', 1);
             $gameSession->increment('try_ads', 5);
+            $gameSession->increment('usetryads', 0);
             return response()->json(["mesg" => "I got five new tries "], 200);
         } else
             return response()->json(["mesg" => "You have to wait for tomorrow "], 200);
