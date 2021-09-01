@@ -5,20 +5,20 @@
 <div class="container">
     {{-- action="/users/update/{{$user->id}}" method="POST" --}}
     <h1 style="color: white; overflow: hidden; text-align: center">Questions & Answers</h1>
-    <form action="{{route('store.awards')}}" method="post" enctype="multipart/form-data">
+    <form action="{{ route('update.awards',$award->id) }}" method="post" enctype="multipart/form-data">
         @csrf
         <div class="row align-items-center  mr-4">
 
             <div class="step-one row">
                 <div class="row col-6">
                     <label for="">name:
-                        <input type="text" name="name" id="name" class="form-control" required>
+                        <input type="text" name="name" value="{{ $award->name }}" id="name" class="form-control" required>
                     </label>
                 </div>
 
                 <div class="row col-6">
                     <label for="">point:
-                        <input type="text" name="point" id="point" class="form-control" required></label>
+                        <input type="text" name="point" id="point" value="{{ $award->point }}" class="form-control" required></label>
                 </div>
                 <div class="row col-12">
                     <div class="custom-file">

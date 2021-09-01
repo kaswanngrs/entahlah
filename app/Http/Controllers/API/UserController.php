@@ -9,10 +9,11 @@ use App\Http\Controllers\Controller;
 use App\User;
 use App\UserPoints;
 use Illuminate\Support\Facades\Auth;
-use Validator;
+// use Validator;
 use Illuminate\Support\Str;
 
-use DB;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -111,7 +112,7 @@ class UserController extends Controller
               "priority": "high",
               "data": {
                "click_action": "FLUTTER_NOTIFICATION_CLICK",
-              
+
                 },
               }';
         $ch = curl_init();

@@ -18,4 +18,7 @@ CHANGE COLUMN `answer_1` `answer` TEXT COLLATE 'utf8mb4_unicode_ci' NOT NULL ;
 -----------------
 ALTER TABLE `sayd_astora`.`game_attributes`
 CHANGE COLUMN `points-per-try` `points_per_try` INT(10) UNSIGNED NOT NULL ;
+------------------
 
+ALTER TABLE `tasks` ADD `deleted_at` TIMESTAMP NULL AFTER `updated_at`;
+ALTER TABLE `awards` ADD `deleted_at` TIMESTAMP NULL AFTER `updated_at`;
