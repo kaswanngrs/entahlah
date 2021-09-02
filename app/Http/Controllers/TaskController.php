@@ -17,8 +17,8 @@ class TaskController extends Controller
      */
     public function index()
     {
-        $tasks=Task::get();
-        return view('admin.task.Show',compact('tasks'));
+        $tasks = Task::get();
+        return view('admin.task.Show', compact('tasks'));
     }
 
 
@@ -30,37 +30,30 @@ class TaskController extends Controller
     public function indexApi()
     {
         //
-      $Task = Task ::all();
-      $arrayTask  =array();
-      foreach ($Task  as $task){
+        $Task = Task::all();
+        $arrayTask  = array();
+        foreach ($Task  as $task) {
 
 
-        $arrayTask[] =  url('').'/api/auth/ShowLink/'.$task->id;
-
-      }
-      return response()->json([$arrayTask],200);
-
+            $arrayTask[] =  url('') . '/api/auth/ShowLink/' . $task->id;
+        }
+        return response()->json([$arrayTask], 200);
     }
 
 
 
     public function ShowLink($id)
     {
-        //
-
-        $Task = Task ::find($id);
-
-        if($Task == null )
-            return response()->json(["msg" => "you have error "],401);
-
+        $Task = Task::find($id);
+        if ($Task == null)
+            return response()->json(["msg" => "you have error "], 401);
 
         return  redirect()->away($Task->Task);
-
-
     }
 
 
-    public function addPointTask(Request $request){
+    public function addPointTask(Request $request)
+    {
 
         $user_points = \App\UserPoints::updateOrCreate(
             [
@@ -73,8 +66,7 @@ class TaskController extends Controller
         );
         $user_points->increment('points', 15);
         $user_points->save();
-        return response()->json(['task'=>'success Add task point ', 'Add_point'=>true],200);
-
+        return response()->json(['task' => 'success Add task point ', 'Add_point' => true], 200);
     }
     /**
      * Show the form for creating a new resource.
@@ -85,7 +77,6 @@ class TaskController extends Controller
     {
         //
         return view('admin.task.create');
-
     }
 
     /**
@@ -98,7 +89,7 @@ class TaskController extends Controller
     {
 
         //
-        $Task = Task ::create(["Task" => $request->input('Task')]) ;
+        $Task = Task::create(["Task" => $request->input('Task')]);
         return redirect()->route('show');
     }
 
@@ -123,8 +114,8 @@ class TaskController extends Controller
      */
     public function edit($id)
     {
-        $task=Task::where('id',$id)->first();
-        return view('admin.task.edit',compact('task'));
+        $task = Task::where('id', $id)->first();
+        return view('admin.task.edit', compact('task'));
     }
 
     /**
@@ -136,10 +127,11 @@ class TaskController extends Controller
      */
     public function update(Request $request, $id)
     {
-         $this->validate($request, [
-            'task' => 'required']);
+        $this->validate($request, [
+            'task' => 'required'
+        ]);
         $input['task'] = $request->task;
-        DB::table('tasks')->where('id','=',$id)->update($input);
+        DB::table('tasks')->where('id', '=', $id)->update($input);
         return redirect()->route('show');
     }
 
@@ -151,8 +143,8 @@ class TaskController extends Controller
      */
     public function destroy($id)
     {
-    $tasks = Task::find( $id );
-    $tasks->delete();
-    return back();
+        $tasks = Task::find($id);
+        $tasks->delete();
+        return back();
     }
 }

@@ -43,14 +43,11 @@
 
                         </tr>
                         @endforeach
-
                     @endif
-
-
                 </tbody>
               </table>
         </div>
-
+        {{$users->links()}}
 </div>
 
 @endsection

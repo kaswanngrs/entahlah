@@ -154,7 +154,7 @@ class UserController extends Controller
                     Auth::loginUsingId($user->id);
                 else {
                     $input =  request()->all();
-                    $validator = Validator::make( $input, [
+                    $validator = Validator::make($input, [
                         'name' => ['required', 'string', 'max:255'],
                         'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
                         'age' => ['required', 'integer'],
@@ -223,7 +223,7 @@ class UserController extends Controller
 
     public function index()
     {
-        $users = User::all()->where('role', 'user');
+        $users = User::where('role', 'user')->paginate(10);
 
         return view('admin.users.index', ['users' => $users]);
     }
