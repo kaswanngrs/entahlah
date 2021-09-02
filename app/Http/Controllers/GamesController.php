@@ -13,9 +13,10 @@ use App\User;
 use Exception;
 use App\gameSession;
 use function PHPUnit\Framework\isEmpty;
-use Validator;
+// use Validator;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Validator;
 
 class GamesController extends Controller
 {
