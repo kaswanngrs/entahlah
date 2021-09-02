@@ -22,41 +22,37 @@ class QuestionsController extends Controller
     public function index()
     {
         $questions = Questions::all();
-        if($questions){
-            $data = [] ;
+        if ($questions) {
+            $data = [];
             foreach ($questions as $question) {
-                $data [] = [
-                    'question_id'=>$question->id,
-                    'question_title'=>$question->question,
-                    'question_correct_answer'=>$question->correct_answer,
-                    'question_status'=>$question->status ? 'Active' : 'Not Active',
+                $data[] = [
+                    'question_id' => $question->id,
+                    'question_title' => $question->question,
+                    'question_correct_answer' => $question->correct_answer,
+                    'question_status' => $question->status ? 'Active' : 'Not Active',
                 ];
             }
         }
-            return view('admin.questions.index',['questions'=>$data]);
-
+        return view('admin.questions.index', ['questions' => $data]);
     }
-   
+
 
     public function indexApi()
     {
 
         $questions = Questions::all();
-        if($questions){
-            $data = [] ;
+        if ($questions) {
+            $data = [];
             foreach ($questions as $question) {
-                $data [] = [
-                    'question_id'=>$question->id,
-                    'question_title'=>$question->question,
-                    'question_correct_answer'=>$question->correct_answer,
-                    'question_status'=>$question->status ? 'Active' : 'Not Active',
+                $data[] = [
+                    'question_id' => $question->id,
+                    'question_title' => $question->question,
+                    'question_correct_answer' => $question->correct_answer,
+                    'question_status' => $question->status ? 'Active' : 'Not Active',
                 ];
             }
         }
-        return response()->json(["questions"=>  $data ], 202);
-
-
-
+        return response()->json(["questions" =>  $data], 202);
     }
     /**
      * Show the form for creating a new resource.
@@ -85,15 +81,15 @@ class QuestionsController extends Controller
 
         ]);
         if ($validator->fails()) {
-                    return response()->json(['error'=>$validator->errors()], 401);
-                }
+            return response()->json(['error' => $validator->errors()], 401);
+        }
         $question = new Questions();
 
         $question->question = $request->question;
         $question->status = $request->status;
         $question->save();
 
-        foreach($request->answers as $ans){
+        foreach ($request->answers as $ans) {
             $answer = new Answers();
             $answer->question_id = $question->id;
             $answer->answer = $ans;
@@ -106,8 +102,8 @@ class QuestionsController extends Controller
         $all_answer = [];
         foreach ($question->answers as $one) {
             $all_answer[] = [
-                'answer_id'=>$one->id,
-                'answer'=>$one->answer,
+                'answer_id' => $one->id,
+                'answer' => $one->answer,
             ];
         }
         $data['answers'] = $all_answer;
@@ -116,10 +112,7 @@ class QuestionsController extends Controller
 
 
 
-        return response()->json([ $data], $this-> successStatus);
-
-
-
+        return response()->json([$data], $this->successStatus);
     }
 
     /**
@@ -142,9 +135,8 @@ class QuestionsController extends Controller
     public function edit($id)
     {
         $question = Questions::findOrFail($id);
-        if($question){
-       return view('admin.questions.edit',['question'=>$question]);
-
+        if ($question) {
+            return view('admin.questions.edit', ['question' => $question]);
         }
     }
 
@@ -155,31 +147,28 @@ class QuestionsController extends Controller
      * @param  \App\Questions  $questions
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request,$id)
+    public function update(Request $request, $id)
     {
-       $question = Questions::findOrFail($id);
-       if($question){
-           $question->question = $request->title;
-           $question->status = $request->status;
-           $question->correct_answer_id = $request->correct_answer;
+        $question = Questions::findOrFail($id);
+        if ($question) {
+            $question->question = $request->title;
+            $question->status = $request->status;
+            $question->correct_answer_id = $request->correct_answer;
 
-           $question->save();
+            $question->save();
 
-             return redirect('/questions/edit/'.$id)->with('success','Question updated Successfully.');
-
-
-       }
+            return redirect('/questions/edit/' . $id)->with('success', 'Question updated Successfully.');
+        }
     }
 
     public function updateAnswer(Request $request, $id)
     {
         $answer = Answers::findOrFail($id);
 
-        if($answer){
+        if ($answer) {
             $answer->answer = $request->answer;
             $answer->save();
-            return redirect('/questions/edit/'.$answer->question->id)->with('success','Answer updated Successfully.');
-
+            return redirect('/questions/edit/' . $answer->question->id)->with('success', 'Answer updated Successfully.');
         }
     }
 
@@ -192,23 +181,20 @@ class QuestionsController extends Controller
     public function destroy($id)
     {
         $question = Questions::findOrFail($id);
-        if($question){
+        if ($question) {
             $question->delete();
-            return redirect('/questions')->with('error','Question delete Successfully.');
+            return redirect('/questions')->with('error', 'Question delete Successfully.');
         }
-
     }
 
     public function setCorrectAnswer(Request $request)
     {
         $question = Questions::findOrFail($request->question_id);
-        if($question){
-            $question->correct_answer_id = $request->correct_answer_id ;
+        if ($question) {
+            $question->correct_answer_id = $request->correct_answer_id;
             $question->save();
         }
 
-        return redirect('/questions')->with('success','Question add Successfully.');
-
-
+        return redirect('/questions')->with('success', 'Question add Successfully.');
     }
 }

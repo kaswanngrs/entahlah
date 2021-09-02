@@ -13,9 +13,10 @@ use App\User;
 use Exception;
 use App\gameSession;
 use function PHPUnit\Framework\isEmpty;
-use Validator;
+// use Validator;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Validator;
 
 class GamesController extends Controller
 {
@@ -404,7 +405,9 @@ class GamesController extends Controller
             $gameSession =  gameSession::create([
                 'user_id'   => Auth::user()->id,
                 'game_id'  => $game_id,
-                'attempts' => 0
+                'attempts' => 0,
+                'use_try_ads' => 0,
+                'date_end_attempts' => null,
             ]);
 
         $try_ads = $gameSession->try_ads;
