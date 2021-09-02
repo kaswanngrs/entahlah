@@ -106,8 +106,8 @@ class GamesController extends Controller
             $data['UserPoints'] =  UserPoints::where("user_id", "=", Auth::user()->id)->get();
 
             if ($data['UserPoints']->count() == 0)
-                $data['UserPoints'] = array('points' => 0);
-            return response()->json([$data], 201);
+                $data['UserPoints'] =UserPoints::where("user_id", "=", Auth::user()->id)->get();
+            return response()->json([$data], 200);
         } else
             return response()->json(["unauthorize"], 401);
     }

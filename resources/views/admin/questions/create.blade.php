@@ -34,31 +34,20 @@
                             </select>
                     </div>
                 </div>
-
-
-
-
-
-
-                <!-- Modal -->
-                <div class="popup-overlay">
+                <!-- Modal popup-overlay -->
+                <div class="">
                     <!--Creates the popup content-->
                     <div class="popup-content">
                         <h2>Select Correct Answer</h2>
                         <h3 id="question"></h3>
-                        <select name="answers" id="answers" onchange="getval(this);" class="form-control">
+                        <select name="answers" id="answers" onclick="getval(this);" class="form-control">
                             <option value="" selected></option>
                         </select>
                         <!--popup's close button-->
-                        <button class="close ">Close</button>
+                        <button class="close" onclick="location.href='/questions';">Close</button>
                     </div>
                 </div>
                 <!--Content shown when popup is not displayed-->
-
-
-
-
-
                 <div class="row col-12">
                     <button id="addQuestion" class="btn btn-primary open">Save</button>
                 </div>
@@ -66,5 +55,3 @@
     </div>
 
 @endsection
-
-
