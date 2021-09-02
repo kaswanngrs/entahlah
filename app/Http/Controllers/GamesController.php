@@ -104,10 +104,9 @@ class GamesController extends Controller
         if (Auth::user()) {
 
             $data['UserPoints'] =  UserPoints::where("user_id", "=", Auth::user()->id)->get();
-
             if ($data['UserPoints']->count() == 0)
-                $data['UserPoints'] = array('points' => 0);
-            return response()->json([$data], 201);
+                $data['UserPoints'] = UserPoints::where("user_id", "=", Auth::user()->id)->get();
+            return response()->json([$data], 200);
         } else
             return response()->json(["unauthorize"], 401);
     }
@@ -363,25 +362,34 @@ class GamesController extends Controller
         if (!$gameattribute) {
             return response()->json(["mesg" => "id game does not exist"], 200);
         } elseif (!$gamesession) {
+            $data['can_join_game'] = true;
+            $data['can_adds_try'] = true;
+            $data['can_view_adds'] = true;
+            $data['attempts_max'] = $gameattribute->attempts;
+            $data['ads_max'] = $gameattribute->ads_count;
+            $data['number_add_try_ads'] = 0;
+            $data['gamesession']['id'] = 0;
             $data['gamesession']['attempts'] = 0;
             $data['gamesession']['ads'] = 0;
             $data['gamesession']['try_ads'] = 0;
             $data['gamesession']['game_id'] = $gameattribute->game_id;
+            $data['gamesession']['use_try_ads'] = 0;
             $data['gamesession']['user_id '] = Auth::user()->id;
-            $data['gameattribute']  = $gameattribute;
+            $data['gamesession']['created_at'] = 0;
+            $data['gamesession']['updated_at'] = 0;
+            $data['gamesession']['date_end_attempts'] = null;
+
+            // $data['gameattribute']  = $gameattribute;
+
             return response()->json(['data' => $data], 200);
         }
-
-
         $try_ads = $gamesession->try_ads;
-
         $attempts = $gamesession->attempts;
         $data['can_join_game'] = ($attempts >= $gameattribute->attempts) ? false : true;
         $data['can_adds_try'] = ($gamesession->use_try_ads >= $gamesession->try_ads) ? false : true;
         $data['can_view_adds'] = ($gamesession->ads >= $gameattribute->ads_count) ? false : true;
         $data['attempts_max'] = $gameattribute->attempts;
         $data['ads_max'] = $gameattribute->ads_count;
-
         $data['number_add_try_ads'] = $gamesession->try_ads - $gamesession->use_try_ads;
         $data['game_session']  = $gamesession;
         return response()->json(['data' => $data], 200);

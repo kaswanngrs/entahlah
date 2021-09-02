@@ -49,24 +49,6 @@
                                 </select>
                             </label>
                         </div>
-
-                        {{-- <div class="col-12">
-                        <label for="">Status:
-                            <select name="status" id="status" class="form-control" required>
-                                <option value="0">Not Active</option>
-                                <option value="1" selected> Active</option>
-                            </select>
-                    </div> --}}
-                        {{-- <div class="col-12">
-                        <label for="">Correct answer:
-                            <select name="correct_answer" id="status" class="form-control" required>
-                                @foreach ($question->answers as $answer)
-
-                                    <option {{$question->correct_answer_id ==$answer->id ? 'selected' : ''}} value="{{$answer->id}}">{{$answer->answer}}</option>
-
-                                @endforeach
-                            </select>
-                    </div> --}}
                         <div class="col-md-12">
                             <button type="submit" class="btn btn-primary btn-lg">Edit</button>
                         </div>

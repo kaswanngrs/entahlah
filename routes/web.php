@@ -68,8 +68,6 @@ Route::prefix('awards')->group(function()
     Route::post('/notifction/store','notifctionController@store');
 
 });
-
-
 Route::get('privacyploicy.html','PrivacyPolicyController@index');
 Route::view('/', 'auth.login');
 

@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use App\Answers;
 use App\Questions;
 use Illuminate\Http\Request;
-use Validator;
+use Illuminate\Support\Facades\Validator;
+// use Validator;
 
 use Symfony\Component\Console\Question\Question;
 
@@ -41,14 +42,17 @@ class QuestionsController extends Controller
     {
 
         $questions = Questions::all();
+
         if ($questions) {
             $data = [];
             foreach ($questions as $question) {
+                $answer=Answers::where('question_id',$question->id)->get();
                 $data[] = [
                     'question_id' => $question->id,
                     'question_title' => $question->question,
                     'question_correct_answer' => $question->correct_answer,
                     'question_status' => $question->status ? 'Active' : 'Not Active',
+                    'answer'=>$answer
                 ];
             }
         }
@@ -72,7 +76,6 @@ class QuestionsController extends Controller
      */
     public function store(Request $request)
     {
-
         $validator = Validator::make($request->all(), [
             'question' => ['required', 'string'],
             'answers' => ['required'],
@@ -91,9 +94,9 @@ class QuestionsController extends Controller
 
         foreach ($request->answers as $ans) {
             $answer = new Answers();
+
             $answer->question_id = $question->id;
             $answer->answer = $ans;
-
             $answer->save();
         }
         // dd($question->answers);
@@ -107,11 +110,6 @@ class QuestionsController extends Controller
             ];
         }
         $data['answers'] = $all_answer;
-
-
-
-
-
         return response()->json([$data], $this->successStatus);
     }
 
@@ -164,7 +162,6 @@ class QuestionsController extends Controller
     public function updateAnswer(Request $request, $id)
     {
         $answer = Answers::findOrFail($id);
-
         if ($answer) {
             $answer->answer = $request->answer;
             $answer->save();
