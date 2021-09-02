@@ -61,3 +61,4 @@ Route::group(['middleware' => 'auth:api','prefix'=>'auth'], function(){
 });
 
 
+Route::get('reset_time_attimpte','GamesController@reset_time_attimpte');

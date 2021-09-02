@@ -15,6 +15,7 @@ use App\gameSession;
 use function PHPUnit\Framework\isEmpty;
 use Validator;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class GamesController extends Controller
 {
@@ -374,14 +375,13 @@ class GamesController extends Controller
         $try_ads = $gamesession->try_ads;
 
         $attempts = $gamesession->attempts;
-
         $data['can_join_game'] = ($attempts >= $gameattribute->attempts) ? false : true;
-        $data['can_adds_try'] = ($gamesession->usetryads >= $gamesession->try_ads) ? false : true;
-        $data['can_view_adds'] = ($gamesession->ads <= $gameattribute->ads_count) ? false : true;
+        $data['can_adds_try'] = ($gamesession->use_try_ads >= $gamesession->try_ads) ? false : true;
+        $data['can_view_adds'] = ($gamesession->ads >= $gameattribute->ads_count) ? false : true;
         $data['attempts_max'] = $gameattribute->attempts;
         $data['ads_max'] = $gameattribute->ads_count;
 
-        $data['number_add_try_ads'] = $gamesession->try_ads - $gamesession->usetryads;
+        $data['number_add_try_ads'] = $gamesession->try_ads - $gamesession->use_try_ads;
         $data['game_session']  = $gamesession;
         return response()->json(['data' => $data], 200);
     }
@@ -410,23 +410,19 @@ class GamesController extends Controller
         $try_ads = $gameSession->try_ads;
 
         $attempts = $gameSession->attempts;
-        $data['can_view_adds'] = true;
-        $data['can_adds_try'] = true;
-        $data['can_join_game'] = true;
-        if ($attempts < $GameAttribute->attempts) {
-            $gameSession->increment('attempts', 1);
-        } elseif ($try_ads > 0) {
-            $data['can_join_game'] = false;
-            $gameSession->increment('usetryads', 1);
-        } else {
 
-            if ($gameSession->ads <= $GameAttribute->ads_count)
-                $data['can_view_adds'] = false;
-
-                $data['can_adds_try'] = false;
-                $data['can_join_game'] = false;
+        if ($attempts >= $GameAttribute->attempts && $gameSession->date_end_attempts  === null) {
+            $mutable = Carbon::now();
+            $gameSession->date_end_attempts =  $mutable->addDay('1')->format('Y-m-d');
         }
-
+        if ($attempts < $GameAttribute->attempts)
+            $gameSession->increment('attempts', 1);
+        elseif ($gameSession->use_try_ads < $gameSession->try_ads) {
+            $gameSession->increment('use_try_ads', 1);
+        }
+        $data['can_join_game'] = ($attempts >= $GameAttribute->attempts) ? false : true;
+        $data['can_adds_try'] = ($gameSession->use_try_ads >= $gameSession->try_ads) ? false : true;
+        $data['can_view_adds'] = ($gameSession->ads >= $GameAttribute->ads_count) ? false : true;
 
         $data['attempts_max'] = $GameAttribute->attempts;
         $data['ads_max'] = $GameAttribute->ads_count;
@@ -462,14 +458,28 @@ class GamesController extends Controller
         if ($gameSession->ads < $GameAttribute->ads_count) {
             $gameSession->increment('ads', 1);
             $gameSession->increment('try_ads', 5);
-            $gameSession->increment('usetryads', 0);
+            $gameSession->increment('use_try_ads', 0);
             return response()->json(["mesg" => "I got five new tries "], 200);
         } else
             return response()->json(["mesg" => "You have to wait for tomorrow "], 200);
     }
 
 
+    public function reset_time_attimpte()
+    {
+        $mutable = Carbon::now();
+        $mutable = $mutable->format('Y-m-d');
+        $gameSession = gameSession::where('date_end_attempts', '=', $mutable)->update([
 
+            'use_try_ads' => 0,
+            'try_ads' => 0,
+            'ads' => 0,
+            'attempts' => 0,
+            'date_end_attempts' => null,
+        ]);
+
+        return response()->json(["mesg" => "done"], 200);
+    }
 
     public function  GameSession(Request $request)
     {
