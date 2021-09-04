@@ -363,8 +363,8 @@
 
                                             <div style="line-height: 24px">
 
-                                               Sayd Aostra icons wishes you and your children the best times
-                                                with us.<br>
+                                                Sayd Aostra icons wishes you the best times with us.
+                                                <br>
 
                                             </div>
                                         </td>
@@ -411,10 +411,10 @@
                                 <tr>
                                     <!-- logo -->
                                     <td align="left">
-                                        <a href="http://nmnom.com"
+                                        <a href="http://phplaravel-596541-2044229.cloudwaysapps.com/"
                                             style="display: block; border-style: none !important; border: 0 !important;"><img
                                                 width="80" border="0" style="display: block; width: 80px;"
-                                                src="http://test.nmnom.com/homecss/img/logo.svg" alt="" /></a>
+                                                src="http://phplaravel-596541-2044229.cloudwaysapps.com/icons/logo.png" alt="" /></a>
                                     </td>
                                 </tr>
 
@@ -430,7 +430,7 @@
                                             style="color: #333333; font-size: 14px; font-family: 'Work Sans', Calibri, sans-serif; font-weight: 600; mso-line-height-rule: exactly; line-height: 23px;">
 
                                             Email us: <br /> <a href="mailto:"
-                                                style="color: #888888; font-size: 14px; font-family: 'Hind Siliguri', Calibri, Sans-serif; font-weight: 400;">info@nmnom.com</a>
+                                                style="color: #888888; font-size: 14px; font-family: 'Hind Siliguri', Calibri, Sans-serif; font-weight: 400;">support@saydostotra.com</a>
 
                                         </div>
                                     </td>
@@ -526,7 +526,7 @@
                                         style="color: #aaaaaa; font-size: 14px; font-family: 'Work Sans', Calibri, sans-serif; line-height: 24px;">
                                         <div style="line-height: 24px;">
 
-                                            <span style="color: #333333;">Nmnom Educational Platform</span>
+                                            <span style="color: #333333;">Sayd Aostra icons</span>
 
                                         </div>
                                     </td>

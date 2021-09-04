@@ -57,6 +57,7 @@ Route::group(['middleware' => 'auth:api','prefix'=>'auth'], function(){
     Route::post('Winer/add','WinerController@storeApi');
     Route::get('get_All_Notifcation','notifctionController@getAllNotifcation');
     Route::get('showinformation','GamesController@showattent');
+    Route::post('counterquestion','QuestionsController@counterquestion');
 
 });
 

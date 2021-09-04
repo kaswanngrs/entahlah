@@ -3,8 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Answers;
+use App\ConterQuestion;
 use App\Questions;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 // use Validator;
 
@@ -193,5 +197,20 @@ class QuestionsController extends Controller
         }
 
         return redirect('/questions')->with('success', 'Question add Successfully.');
+    }
+
+    public function counterquestion(Request $request)
+    {
+       $this->validate($request,[
+           'question_id'=>'required'
+       ]);
+
+       $data['user_id']=Auth::user()->id;
+       $data['question_id']=$request->question_id;
+       $data['created_at']=Carbon::now();
+       DB::table('conter_questions')->insert($data);
+       return response()->json(['CounterQuestion'=>$data]);
+
+
     }
 }

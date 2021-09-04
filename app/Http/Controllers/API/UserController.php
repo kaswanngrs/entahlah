@@ -8,12 +8,15 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\User;
 use App\UserPoints;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 // use Validator;
 use Illuminate\Support\Str;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use App\Mail\ForgetPassword;
+use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
 {
@@ -54,26 +57,33 @@ class UserController extends Controller
 
     public function check_code_Password(Request $request)
     {
-        $flag = true;
         $validator = Validator::make(request()->all(), [
-            'code' => 'required',
-
+            'code' => 'required|unique:password_resets',
         ]);
-        if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], 401);
+        // if ($validator->fails()) {
+        //     return response()->json(['error' => $validator->errors()], 401);
+        // }
+
+        $password_reset = DB::table('password_resets')->where('token', $request->code)->first();
+        $end = Carbon::now();
+        if($password_reset)
+        {
+            $t = strtotime($password_reset->created_at);
+            if (strtotime('+15 minutes',$t) >= (strtotime($end))) {
+                return response()->json(['success' => true, 'mesg' => 'code is math'],200);
+            }
+            return response()->json(['success' => true, 'mesg' => 'please resend code '],200);
         }
 
 
-        $password_resets = DB::table('password_resets')->where('token', $request->input('code'))->first();
+        // if ($password_resets === null)
+        //     $flag = false;
 
-        if ($password_resets === null)
-            $flag = false;
-
-        if ($flag  === true)
-            $message = "mcode is math";
-        else
-            $message = "mcode is  not math";
-        return response()->json(['success' =>  $flag, 'mesg' => $message], 200);
+        // if ($flag  === true)
+        //     $message = "mcode is math";
+        // else
+        //     $message = "mcode is  not math";
+        // return response()->json(['success' =>  $flag, 'mesg' => $message], 200);
     }
 
     public function password_resets(Request $request)
@@ -91,31 +101,34 @@ class UserController extends Controller
         DB::table('password_resets')->insert([
             'email' => $request->email,
             'token' => $token,
+            'created_at'=>Carbon::now()
         ]);
 
-        $curl = curl_init();
+       Mail::to($request->email)->send(new ForgetPassword ($user,$token));
+        return response()->json(['success ' => 'is successfully'], 200);
+        // $curl = curl_init();
 
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://api.mailgun.net/v3/sandbox996afde24fbe4c7aa9ee7f9e3fbbbfd9.mailgun.org/messages',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS => array('from' => 'Mailgun Sandbox
-            <postmaster@sandbox996afde24fbe4c7aa9ee7f9e3fbbbfd9.mailgun.org>',
-            'to' =>$request->email,
-             'subject' => 'ForgetPassword',
-              'text' => $templateemail),
-            CURLOPT_HTTPHEADER => array(
-                'Authorization: Basic YXBpOjI1MjY0YTE2ZTgzZGUzOGIyMjBlNjg2YmYyOTVjYTY2LTE1NmRiMGYxLTc4YTJjMjYy'
-            ),
-        ));
-        $response = curl_exec($curl);
-        curl_close($curl);
-         echo $response;
+        // curl_setopt_array($curl, array(
+        //     CURLOPT_URL => 'https://api.mailgun.net/v3/sandbox996afde24fbe4c7aa9ee7f9e3fbbbfd9.mailgun.org/messages',
+        //     CURLOPT_RETURNTRANSFER => true,
+        //     CURLOPT_ENCODING => '',
+        //     CURLOPT_MAXREDIRS => 10,
+        //     CURLOPT_TIMEOUT => 0,
+        //     CURLOPT_FOLLOWLOCATION => true,
+        //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        //     CURLOPT_CUSTOMREQUEST => 'POST',
+        //     CURLOPT_POSTFIELDS => array('from' => 'Mailgun Sandbox
+        //     <postmaster@sandbox996afde24fbe4c7aa9ee7f9e3fbbbfd9.mailgun.org>',
+        //     'to' =>$request->email,
+        //      'subject' => 'ForgetPassword',
+        //       'text' => $templateemail),
+        //     CURLOPT_HTTPHEADER => array(
+        //         'Authorization: Basic YXBpOjI1MjY0YTE2ZTgzZGUzOGIyMjBlNjg2YmYyOTVjYTY2LTE1NmRiMGYxLTc4YTJjMjYy'
+        //     ),
+        // ));
+        // $response = curl_exec($curl);
+        // curl_close($curl);
+        //  echo $response;
 
         // $topic = "/topics/ostura";
         // $apiAccess = 'AAAASbubh_U:APA91bFkpouLinHPUEkZWwyHyiujWKA-eOcebUB9WzWQ_I38Sq4Ng6ifhG8N6OX6TBgOb8N8aPEqhmI1wRLaIXMMN_qzXumMpMHwv7splCvIJIqbEaybABZ7KQ8dIadv5urXYFFkFkKV';
@@ -147,12 +160,10 @@ class UserController extends Controller
         // $result = curl_exec($ch);
         // curl_close($ch);
 
-        return response()->json(['success ' => 'is successfully'], 200);
+
     }
     public function login()
     {
-
-
         try {
             $falg = false;
             $validator = Validator::make(request()->all(), [
