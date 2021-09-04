@@ -60,21 +60,20 @@ class UserController extends Controller
         $validator = Validator::make(request()->all(), [
             'code' => 'required|unique:password_resets',
         ]);
-        // if ($validator->fails()) {
-        //     return response()->json(['error' => $validator->errors()], 401);
-        // }
-
         $password_reset = DB::table('password_resets')->where('token', $request->code)->first();
         $end = Carbon::now();
         if($password_reset)
         {
             $t = strtotime($password_reset->created_at);
             if (strtotime('+15 minutes',$t) >= (strtotime($end))) {
-                return response()->json(['success' => true, 'mesg' => 'code is math'],200);
+                return response()->json(['success' => true, 'mesg' => 'code is match'],200);
             }
-            return response()->json(['success' => true, 'mesg' => 'please resend code '],200);
+            return response()->json(['success' => true, 'mesg' => 'please resend code'],200);
         }
-
+        else
+        {
+            return response()->json(['success'=>true,'mesg'=>'not found code'],200);
+        }
 
         // if ($password_resets === null)
         //     $flag = false;
