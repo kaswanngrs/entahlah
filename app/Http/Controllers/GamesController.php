@@ -101,11 +101,10 @@ class GamesController extends Controller
     public function TotalPoint(Request  $request)
     {
 
-        if (Auth::user()) {
-
+        if (Auth::user()){
             $data['UserPoints'] =  UserPoints::where("user_id", "=", Auth::user()->id)->get();
             if ($data['UserPoints']->count() == 0)
-                $data['UserPoints'] = UserPoints::where("user_id", "=", Auth::user()->id)->get();
+                $data['UserPoints'] =array(['id'=>auth::user()->id,'user_id'=>0,'game_id'=>0,'points'=>0,'created_at'=>auth::user()->created_at,'updated_at'=>auth::user()->updated_at]);
             return response()->json([$data], 200);
         } else
             return response()->json(["unauthorize"], 401);

@@ -78,7 +78,9 @@ class UserController extends Controller
 
     public function password_resets(Request $request)
     {
-
+        $token = Str::random(6);
+        $user=User::where('email',$request->email)->first();
+        $templateemail=view('email',compact('user','token'));
         $validator = Validator::make(request()->all(), [
             'email' => 'required|email|exists:users',
         ]);
@@ -86,44 +88,64 @@ class UserController extends Controller
             return response()->json(['error' => $validator->errors()], 401);
         }
 
-
-        $token = Str::random(5);
-
         DB::table('password_resets')->insert([
             'email' => $request->email,
             'token' => $token,
-
         ]);
 
-        $topic = "/topics/ostura";
-        $apiAccess = 'AAAASbubh_U:APA91bFkpouLinHPUEkZWwyHyiujWKA-eOcebUB9WzWQ_I38Sq4Ng6ifhG8N6OX6TBgOb8N8aPEqhmI1wRLaIXMMN_qzXumMpMHwv7splCvIJIqbEaybABZ7KQ8dIadv5urXYFFkFkKV';
-        $headers = array(
-            'Authorization: key=' . $apiAccess,
-            'Content-Type: application/json'
-        );
-        $fields = '{
-          "to": "' . $topic . '",
-              "notification": {
-               "title": "اسطورة",
-                "body": "' . $token  . '",
-                "sound": "default",
-                "color": "#990000",
-              },
-              "priority": "high",
-              "data": {
-               "click_action": "FLUTTER_NOTIFICATION_CLICK",
+        $curl = curl_init();
 
-                },
-              }';
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, ($fields));
-        $result = curl_exec($ch);
-        curl_close($ch);
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://api.mailgun.net/v3/sandbox996afde24fbe4c7aa9ee7f9e3fbbbfd9.mailgun.org/messages',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => array('from' => 'Mailgun Sandbox
+            <postmaster@sandbox996afde24fbe4c7aa9ee7f9e3fbbbfd9.mailgun.org>',
+            'to' =>$request->email,
+             'subject' => 'ForgetPassword',
+              'text' => $templateemail),
+            CURLOPT_HTTPHEADER => array(
+                'Authorization: Basic YXBpOjI1MjY0YTE2ZTgzZGUzOGIyMjBlNjg2YmYyOTVjYTY2LTE1NmRiMGYxLTc4YTJjMjYy'
+            ),
+        ));
+        $response = curl_exec($curl);
+        curl_close($curl);
+         echo $response;
+
+        // $topic = "/topics/ostura";
+        // $apiAccess = 'AAAASbubh_U:APA91bFkpouLinHPUEkZWwyHyiujWKA-eOcebUB9WzWQ_I38Sq4Ng6ifhG8N6OX6TBgOb8N8aPEqhmI1wRLaIXMMN_qzXumMpMHwv7splCvIJIqbEaybABZ7KQ8dIadv5urXYFFkFkKV';
+        // $headers = array(
+        //     'Authorization: key=' . $apiAccess,
+        //     'Content-Type: application/json'
+        // );
+        // $fields = '{
+        //   "to": "' . $topic . '",
+        //       "notification": {
+        //        "title": "اسطورة",
+        //         "body": "' . $token  . '",
+        //         "sound": "default",
+        //         "color": "#990000",
+        //       },
+        //       "priority": "high",
+        //       "data": {
+        //        "click_action": "FLUTTER_NOTIFICATION_CLICK",
+
+        //         },
+        //       }';
+        // $ch = curl_init();
+        // curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
+        // curl_setopt($ch, CURLOPT_POST, true);
+        // curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        // curl_setopt($ch, CURLOPT_POSTFIELDS, ($fields));
+        // $result = curl_exec($ch);
+        // curl_close($ch);
 
         return response()->json(['success ' => 'is successfully'], 200);
     }

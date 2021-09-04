@@ -44,7 +44,7 @@
                             <option value="" selected></option>
                         </select>
                         <!--popup's close button-->
-                        <button class="close" onclick="location.href='/questions';">Save</button>
+                        <button class="btn btn-primary close" onclick="location.href='/questions';">Save</button>
                     </div>
                 </div>
                 <!--Content shown when popup is not displayed-->
