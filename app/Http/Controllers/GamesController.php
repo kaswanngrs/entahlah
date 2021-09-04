@@ -155,15 +155,8 @@ class GamesController extends Controller
 
             if ($User->id == Auth::user()->id)
                 return view("referralLink", ["Worning" => "you can\'t use code"]);
-
-
-
             if ($User->visit_code >= 10)
                 return view("referralLink", ["Worning" => "this code is invalid"]);
-
-
-
-
             $user_points = \App\UserPoints::updateOrCreate(
                 [
                     'user_id'   => $User->id,
@@ -184,21 +177,14 @@ class GamesController extends Controller
     }
     public function referral(Request $request)
     {
-
         if (Auth::user()) {
-
             $rules = [
                 'code' => ['required', 'string', 'max:255'],
             ];
-
             $validator = Validator::make($request->all(), $rules);
-
             if ($validator->fails())
                 return response()->json([$validator->errors()->first()], 401);
-
-
             $User = User::where('referral_code', '=', $request->input('code'))->first();
-
             if ($User ===  null)
                 return response()->json([$User, 'msg' => 'is not match '], 401);
 

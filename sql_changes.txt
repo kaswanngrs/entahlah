@@ -26,3 +26,5 @@ ALTER TABLE `awards` ADD `deleted_at` TIMESTAMP NULL AFTER `updated_at`;
 
 ALTER TABLE `game_sessions` ADD `use_try_ads` INT(11) NOT NULL AFTER `game_id`;
 ALTER TABLE `game_sessions` ADD `date_end_attempts` DATE NULL AFTER `updated_at`;
+
+CREATE TABLE `ostora`.`conter_questions` ( `id` INT NOT NULL AUTO_INCREMENT , `user_id` INT(11) NOT NULL , `question_id` INT(11) NOT NULL , `created_at` TIMESTAMP(6) NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
