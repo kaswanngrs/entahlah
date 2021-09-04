@@ -60,6 +60,4 @@ Route::group(['middleware' => 'auth:api','prefix'=>'auth'], function(){
     Route::post('counterquestion','QuestionsController@counterquestion');
 
 });
-
-
 Route::get('reset_time_attimpte','GamesController@reset_time_attimpte');
