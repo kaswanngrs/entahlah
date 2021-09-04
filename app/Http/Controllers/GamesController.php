@@ -391,7 +391,7 @@ class GamesController extends Controller
         $data['attempts_max'] = $gameattribute->attempts;
         $data['ads_max'] = $gameattribute->ads_count;
         $data['number_add_try_ads'] = $gamesession->try_ads - $gamesession->use_try_ads;
-        $data['gamesession']  = $gamesession;
+        $data['game_session']  = $gamesession;
         return response()->json(['data' => $data], 200);
     }
 
