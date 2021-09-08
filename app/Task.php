@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Task extends Model
 {
     use SoftDeletes;
-    //Task
-    protected $fillable = ['Task'];
+    protected $fillable = ['title','description','channel_name','url_link'];
     protected $dates = ['deleted_at'];
 }

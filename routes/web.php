@@ -17,9 +17,8 @@ use Illuminate\Support\Facades\Route;
 Auth::routes();
 
 Route::middleware(['admin'])->group(function () {
-
+    Route::get('/request','WinerController@index')->name('request');
     Route::get('/home', 'HomeController@index')->name('home');
-
     // users
     Route::get('/users', 'API\UserController@index')->name('users');
     Route::get('/users/edit/{id}', 'API\UserController@edit')->name('users.edit');
@@ -62,8 +61,7 @@ Route::prefix('awards')->group(function()
     Route::get('edit/{id}','AwardsController@edit')->name('edit.awards');
     Route::post('update/{id}','AwardsController@update')->name('update.awards');
 });
-
-
+    // Route::get('request','AwardsController@request')->name('request');
     Route::get('/notifction/create','notifctionController@create');
     Route::post('/notifction/store','notifctionController@store');
 

@@ -38,6 +38,7 @@ class QuestionsController extends Controller
                 ];
             }
         }
+
         return view('admin.questions.index', ['questions' => $data]);
     }
 

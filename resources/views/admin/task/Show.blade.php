@@ -11,7 +11,12 @@
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
-                                    <th scope="col">Task</th>
+                                    <th scope="col">Title</th>
+                                    <th scope="col">ChannelName</th>
+                                    <th scope="col">UrlLink</th>
+                                    <th scope="col">Description</th>
+                                    <th scope="col">Edit</th>
+                                    <th scope="col">Delete</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -22,15 +27,20 @@
                                     @foreach ($tasks as $task)
                                         <tr>
                                             <th scope="row">{{ $i++ }}</th>
-                                            <td>{{ $task->Task }}</td>
+                                            <td>{{ $task->title }}</td>
+                                            <td>{{ $task->channel_name }}</td>
+                                            <td>{{ $task->url_link }}</td>
+                                            <td>{{ $task->description }}</td>
                                             <td>
                                                 <a href="{{route('edit',$task->id) }}" class="btn btn-primary">Edit</a>
-                                                <a href="{{ route('destroy',$task->id) }}" class="btn btn-danger">Delete</a>
+                                            </td>
+                                            <td><a href="{{ route('destroy',$task->id) }}" class="btn btn-danger">Delete</a>
                                             </td>
                                         </tr>
                                     @endforeach
                                 @endif
                             </tbody>
                         </table>
+                        {{ $tasks->links() }}
                     </div>
 @endsection
