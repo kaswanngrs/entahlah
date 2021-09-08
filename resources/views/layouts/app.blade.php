@@ -93,7 +93,45 @@
             background-color: #fff;
 
         }
+    input[type=text] {
+      width: 100%;
+      padding: 12px 20px;
+      margin: 8px 0;
+      display: inline-block;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    input[type=submit] {
+      width: 100%;
+      background-color: #007bff;
+      color: white;
+      padding: 14px 20px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    input[type=submit]:hover {
+      background-color: #007bff;
+    }
+
+    textarea {
+  width: 100%;
+  height: 150px;
+  padding: 12px 20px;
+  box-sizing: border-box;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  background-color: #f8f8f8;
+  font-size: 16px;
+  resize: none;
+}
     </style>
+
+
 </head>
 <body>
     <div id="app">
@@ -191,6 +229,11 @@
                         <li>
                             <a href="{{ route('show.awards') }}" class="cool-link"><i
                                     class="far fa-address-book"></i>Awards</a>
+                        </li>
+
+                        <li>
+                            <a href="{{ route('request') }}" class="cool-link"><i
+                                    class="far fa-address-book"></i>Request</a>
                         </li>
                     </ul>
                 </div>

@@ -5,8 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Task;
 use App\UserPoints;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Response;
 
 class TaskController extends Controller
 {
@@ -17,7 +21,7 @@ class TaskController extends Controller
      */
     public function index()
     {
-        $tasks = Task::get();
+        $tasks = Task::paginate(10);
         return view('admin.task.Show', compact('tasks'));
     }
 
@@ -29,17 +33,35 @@ class TaskController extends Controller
      */
     public function indexApi()
     {
-        //
-        $Task = Task::all();
-        $arrayTask  = array();
+         $Task = Task::all();
+         $alltask  = array();
         foreach ($Task  as $task) {
-
-
-            $arrayTask[] =  url('') . '/api/auth/ShowLink/' . $task->id;
+            $arrayTask['url'] =  url('') . '/api/auth/ShowLink/' . $task->id;
+            $arrayTask['title'] =  $task->title;
+            $arrayTask['channel_name'] =  $task->channel_name;
+            $arrayTask['url_link'] =  $task->url_link;
+            $arrayTask['description'] =  $task->description;
+            $alltask[]=$arrayTask;
         }
-        return response()->json([$arrayTask], 200);
-    }
 
+        if(!empty($alltask)){
+            $respons['status'] = 'true';
+            $respons['message'] = 'Task list';
+            $respons['data']=$alltask;
+        }else{
+           $respons['status'] = 'false';
+           $respons['message'] = 'Task is not found.';
+        }
+        $taskall = collect($alltask);
+        $data = $this->paginate($taskall);
+        return Response::json($data,200);
+    }
+    public function paginate($items, $perPage = 5, $page = null, $options = [])
+    {
+        $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
+        $items = $items instanceof Collection ? $items : Collection::make($items);
+        return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
+    }
 
 
     public function ShowLink($id)
@@ -87,9 +109,21 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
-
+        $this->validate($request,
+        [
+            'title'=>'required|string',
+            'description'=>'required|string',
+            'channel_name'=>'required|string',
+            'url_link'=>'required|string',
+        ]);
         //
-        $Task = Task::create(["Task" => $request->input('Task')]);
+        $Task = Task::create(
+        [
+            "title" => $request->title,
+            "description" => $request->description,
+            "channel_name" => $request->channel_name,
+            "url_link" => $request->url_link,
+        ]);
         return redirect()->route('show');
     }
 
@@ -128,9 +162,16 @@ class TaskController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'task' => 'required'
+            'title'=>'required|string',
+            'description'=>'required|string',
+            'channel_name'=>'required|string',
+            'url_link'=>'required|string',
+
         ]);
-        $input['task'] = $request->task;
+        $input["title"] = $request->title;
+        $input["description"] = $request->description;
+        $input["channel_name"] = $request->channel_name;
+        $input["url_link"] = $request->url_link;
         DB::table('tasks')->where('id', '=', $id)->update($input);
         return redirect()->route('show');
     }

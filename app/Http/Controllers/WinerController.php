@@ -1,15 +1,12 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use Illuminate\Http\Request;
 use App\Winer;
 use App\awards;
 use App\UserPoints;
 use Illuminate\Support\Facades\Auth;
-
-use Validator;
-
+use Illuminate\Support\Facades\Validator;
+// use Validator;
 class WinerController extends Controller
 {
     /**
@@ -20,13 +17,9 @@ class WinerController extends Controller
     public function index()
     {
         //
-
-
+        $Winer  = Winer::paginate(10);
+        return view('admin.request.index',compact('Winer'));
     }
-
-
-
-
     /**
      * Show the form for creating a new resource.
      *
@@ -36,7 +29,6 @@ class WinerController extends Controller
     {
         //
     }
-
     /**
      * Store a newly created resource in storage.
      *
@@ -47,46 +39,29 @@ class WinerController extends Controller
     {
         //
     }
-
-
     /**
      * Display the specified resource.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-
     public function storeApi(Request $request)
     {
-
         $rules = [
             'code' => ['required', 'string', 'max:255'],
             'award_id' => ['required'],
-
         ];
-
-
         $validator = Validator::make($request->all(), $rules);
-
         if ($validator->fails())
             return response()->json([$validator->errors()->first()], 401);
-
-
-
         $awards = awards::find($request->input('award_id'));
         $point = \App\UserPoints::where('user_id', '=', Auth::user()->id)->first();
-
         if ($awards === null)
         return response()->json([" The award does not exists  "], 401);
-
         if ($point === null)
                 return response()->json([" You need to collect starting points "], 401);
-
         if ($point->points   <  $awards->point)
             return response()->json([" You need more point "], 401);
-
-
-
         $user_points = \App\UserPoints::updateOrCreate(
             [
                 'user_id'   => Auth::user()->id,
@@ -98,12 +73,10 @@ class WinerController extends Controller
         );
         $user_points->decrement('points', $awards->point);
         $user_points->save();
-
         $Winer = Winer::create([
             "code" => $request->input('code'),
             "user_id" => Auth::user()->id,
             'award_id' =>  $request->input('award_id'),
-
         ]);
         return response()->json(["Winer"=> $Winer ,"point"=> $user_points,'Awards' =>$awards," You need more point "], 202);
     }
@@ -117,7 +90,6 @@ class WinerController extends Controller
     {
         //
     }
-
     /**
      * Show the form for editing the specified resource.
      *
@@ -128,7 +100,6 @@ class WinerController extends Controller
     {
         //
     }
-
     /**
      * Update the specified resource in storage.
      *
@@ -140,7 +111,6 @@ class WinerController extends Controller
     {
         //
     }
-
     /**
      * Remove the specified resource from storage.
      *

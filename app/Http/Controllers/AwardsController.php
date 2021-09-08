@@ -7,7 +7,7 @@ use App\awards;
 use Illuminate\Support\Facades\DB;
 // use Validator;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator ;
+use Illuminate\Support\Facades\Validator;
 
 class AwardsController extends Controller
 {
@@ -18,7 +18,7 @@ class AwardsController extends Controller
      */
     public function index()
     {
-        $awards=awards::get();
+        $awards=awards::paginate(10);
         return view('admin.awards.index',compact('awards'));
     }
 
@@ -53,7 +53,7 @@ class AwardsController extends Controller
         $rules = [
             'name' => ['required', 'string', 'max:255'],
             'img' => ['required'],
-            'point' => ['required'],
+            'point' => ['required|numeric'],
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -63,16 +63,6 @@ class AwardsController extends Controller
 
         $data = $request->all();
         $data['point'] =  (int) $request->input('point');
-
-        // if (!empty($request->file('img'))) {
-        //     $file = $request->file('img');
-        //     $file_name = time() . '.' . $file->getClientOriginalExtension();
-        //     $destinationPath = $file->storeAs('public/', $file_name);
-        //     $data['img'] =  Storage::disk('local')->url($file_name);
-
-        // }else {
-        //     $data['imag'] = null;
-        // }
         $imageName = time().'.'.$request->img->getClientOriginalExtension();
         $request->img->move(public_path('images/award'), $imageName);
         $data['img']=$imageName;
@@ -112,6 +102,16 @@ class AwardsController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // $this->validate($request->all(),[
+
+        // ]);
+
+        $rules =[
+            'name' => ['required', 'string', 'max:255'],
+            'img' => ['required'],
+            'point' => ['required','numeric'],
+        ];
+       $this->validate($request, $rules);
         $imageName = time().'.'.$request->img->getClientOriginalExtension();
         $request->img->move(public_path('images/award'), $imageName);
         $input['img']=$imageName;
