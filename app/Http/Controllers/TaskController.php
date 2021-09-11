@@ -31,38 +31,34 @@ class TaskController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function indexApi()
+    public function indexApi(Request $request)
     {
-         $Task = Task::all();
-         $alltask  = array();
+        $limit = 1;
+
+        $offset = $request->page ?? 1;
+        $offset = ($offset-1) * $limit;
+
+        $Task = Task::offset($offset)->limit(1)->get();
+        $alltasks  = array();
+
         foreach ($Task  as $task) {
             $arrayTask['url'] =  url('') . '/api/auth/ShowLink/' . $task->id;
             $arrayTask['title'] =  $task->title;
             $arrayTask['channel_name'] =  $task->channel_name;
             $arrayTask['url_link'] =  $task->url_link;
             $arrayTask['description'] =  $task->description;
-            $alltask[]=$arrayTask;
+            $alltasks[]=$arrayTask;
         }
-
-        if(!empty($alltask)){
+        if(!empty($alltasks)){
             $respons['status'] = 'true';
             $respons['message'] = 'Task list';
-            $respons['data']=$alltask;
+            $respons['data']=$alltasks;
         }else{
            $respons['status'] = 'false';
            $respons['message'] = 'Task is not found.';
         }
-        $taskall = collect($alltask);
-        $data = $this->paginate($taskall);
-        return Response::json($data,200);
+        return Response::json($respons,200);
     }
-    public function paginate($items, $perPage = 5, $page = null, $options = [])
-    {
-        $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
-        $items = $items instanceof Collection ? $items : Collection::make($items);
-        return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
-    }
-
 
     public function ShowLink($id)
     {
