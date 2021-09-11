@@ -33,12 +33,12 @@ class TaskController extends Controller
      */
     public function indexApi(Request $request)
     {
-        $limit = 5;
+        $limit = 1;
 
         $offset = $request->page ?? 1;
         $offset = ($offset-1) * $limit;
 
-        $Task = Task::offset($offset)->limit(5)->get();
+        $Task = Task::offset($offset)->limit(1)->get();
         $alltasks  = array();
 
         foreach ($Task  as $task) {
