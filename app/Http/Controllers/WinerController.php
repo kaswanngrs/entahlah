@@ -38,6 +38,13 @@ class WinerController extends Controller
             DB::table('winers')->where('id','=',$id)->update(['status' => "1"]);
 
         }
+        $userpoint=UserPoints::where('user_id',$iduser)->first();
+        $vocher=awards::where('id',$winer->award_id)->first();
+        if($vocher && $userpoint)
+        {
+            $total=($vocher->point)-($userpoint->points);
+            $userpoint=UserPoints::where('user_id',$iduser)->update(['points'=>$total]);
+        }
         Mail::to($user->email)->send(new MailApprove($user));
         return back()->with('success','Approve Winer !');
     }

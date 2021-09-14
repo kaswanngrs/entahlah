@@ -56,6 +56,7 @@ class UsersChangeController extends Controller
         if($vocher && $userpoint)
         {
             $total=($userpoint->points)-($vocher->point);
+            $userpoint=UserPoints::where('user_id',$id)->update($total);
             return response()->json(['total'=>$total],200);
         }
         return response()->json(['total'=>0],200);
