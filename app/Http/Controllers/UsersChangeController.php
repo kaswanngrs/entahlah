@@ -27,6 +27,13 @@ class UsersChangeController extends Controller
         $data['number_id_freefire']          = $request->number_id_freefire;
         $data['number_id_googleplay']        = $request->number_id_googleplay;
 
+        if ($data['number_id_pubg']  ===  null)
+            unset($data['number_id_pubg']);
+        if ($data['number_id_googleplay']  ===  null)
+            unset($data['number_id_googleplay']);
+        if ($data['number_id_freefire']   ===  null)
+            unset($data['number_id_freefire']);
+
         $user = User::where('id', $id)->update($data);
         return response()->json([
             'user_updated' => true,
@@ -34,32 +41,33 @@ class UsersChangeController extends Controller
         ], 201);
     }
 
-    public function check_number_id()
+    public function getInformation()
     {
         $user = Auth::user();
-        $number_id_googleplay = $user->number_id_googleplay ? true : false;
-        $number_id_freefire = $user->number_id_freefire ? true : false;
-        $number_id_pubg = $user->number_id_pubg ? true : false;
-
-        return response()->json(['number_id_pubg' => $number_id_pubg,
-        '$number_id_freefire' => $number_id_freefire,
-        'number_id_googleplay' => $number_id_googleplay
-    ],200);
+        return response()->json(
+            [
+                'email' => $user->email,
+                'number_id_pubg' => $user->number_id_pubg,
+                'number_id_freefire' => $user->number_id_freefire,
+                'number_id_googleplay' => $user->number_id_googleplay,
+            ]
+        );
     }
 
-    public function minuspoint(Request $request)
+    public function check_number_id($type)
     {
-        $id = Auth::user()->id;
-        $userpoint=UserPoints::where('user_id',$id)->first();
-        $vocher=awards::where('id',$request->idawards)->first();
-        // dd($vocher);
-        if($vocher && $userpoint)
-        {
-            $total=($userpoint->points)-($vocher->point);
-            $userpoint=UserPoints::where('user_id',$id)->update($total);
-            return response()->json(['total'=>$total],200);
+        $user = Auth::user();
+        if ($type === "pubg") {
+            $number_id_pubg = $user->number_id_pubg ? true : false;
+            return response()->json(['type' => 'pubg', 'number_id_pubg' => $number_id_pubg], 200);
         }
-        return response()->json(['total'=>0],200);
-
+        if ($type === "googleplay") {
+            $number_id_googleplay = $user->number_id_googleplay ? true : false;
+            return response()->json(['type' => 'googleplay', 'number_id_pubg' => $number_id_googleplay,], 200);
+        }
+        if ($type === "freefire") {
+            $number_id_freefire = $user->number_id_freefire ? true : false;
+            return response()->json(['type' => 'freefire', 'number_id_pubg' => $number_id_freefire,], 200);
+        }
     }
 }
