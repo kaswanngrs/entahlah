@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\notifcation;
+
 class notifctionController extends Controller
 {
     /**
@@ -26,8 +28,8 @@ class notifctionController extends Controller
     public function create()
     {
         //
-
-        return view('admin.notifcation.create');
+        $user=User::get();
+        return view('admin.notifcation.create',compact('user'));
     }
 
     /**
@@ -39,14 +41,14 @@ class notifctionController extends Controller
     public function store(Request $request)
     {
         //
-
-        
-        
         $message = $request->input('message');
-        $notifcation = notifcation ::create([
-                                             'message'=> $message
-                                            ]);
+        $notifcation = notifcation::create([
+            'user_id'=>$request->id_user,
+            'message' => $message
+        ]);
 
+        $user=User::find((int)$request->id_user);
+        $tokenApp= $user->token_App;
         $topic = "/topics/ostura";
         $apiAccess = 'AAAASbubh_U:APA91bFkpouLinHPUEkZWwyHyiujWKA-eOcebUB9WzWQ_I38Sq4Ng6ifhG8N6OX6TBgOb8N8aPEqhmI1wRLaIXMMN_qzXumMpMHwv7splCvIJIqbEaybABZ7KQ8dIadv5urXYFFkFkKV';
         $headers = array(
@@ -54,7 +56,7 @@ class notifctionController extends Controller
             'Content-Type: application/json'
         );
         $fields = '{
-        "to": "' . $topic . '",
+        "to": "' . $tokenApp . '",
             "notification": {
              "title": "اسطورة",
               "body": "' . $message . '",
@@ -64,7 +66,7 @@ class notifctionController extends Controller
             "priority": "high",
             "data": {
              "click_action": "FLUTTER_NOTIFICATION_CLICK",
-            
+
               },
             }';
         $ch = curl_init();
@@ -76,16 +78,14 @@ class notifctionController extends Controller
         curl_setopt($ch, CURLOPT_POSTFIELDS, ($fields));
         $result = curl_exec($ch);
         curl_close($ch);
-
-        return back();
+        return back()->with('success','send Notfication ');
     }
 
     public function getAllNotifcation(Request $request)
     {
 
-        $notifcation = notifcation ::orderBy('updated_at', 'desc')->limit(5)->get();
-        return response()->json(['notifcation' => $notifcation ,'mesg'=>'success get last 5  notifcation '], 202);
-
+        $notifcation = notifcation::orderBy('updated_at', 'desc')->limit(5)->get();
+        return response()->json(['notifcation' => $notifcation, 'mesg' => 'success get last 5  notifcation '], 202);
     }
 
     /**

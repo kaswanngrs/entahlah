@@ -15,6 +15,7 @@
                         <th scope="col">Winer</th>
                         <th scope="col">point</th>
                         <th scope="col">Image</th>
+                        <th scope="col">Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -36,6 +37,16 @@
                                 <td><img src="{{ url('/images/award/' . $award->img) }}" style="width: 40%;height: 67px;"
                                         class="img-responsive"></td>
                                 <td>
+                                    <form action="{{ route('changestatus',$winer->id) }}" method="POST">
+                                        {{ csrf_field() }}
+                                        <button  type="Submit" class="btn btn-xs {{ $winer->status ==1 ? 'btn-success disabled' : 'btn-warning' }}">
+                                          @if($winer->status ==1)
+                                           Aprrove
+                                          @else
+                                          Pending
+                                          @endif
+                                        </button>
+                                      </form>
                                 </td>
                             </tr>
                         @endforeach

@@ -18,6 +18,7 @@ Auth::routes();
 
 Route::middleware(['admin'])->group(function () {
     Route::get('/request','WinerController@index')->name('request');
+    Route::post('changestatus/{id}','WinerController@changestatus')->name('changestatus');
     Route::get('/home', 'HomeController@index')->name('home');
     // users
     Route::get('/users', 'API\UserController@index')->name('users');

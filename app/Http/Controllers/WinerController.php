@@ -3,8 +3,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Winer;
 use App\awards;
+use App\Mail\MailApprove;
+use App\Models\User;
 use App\UserPoints;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 // use Validator;
 class WinerController extends Controller
@@ -18,7 +22,24 @@ class WinerController extends Controller
     {
         //
         $Winer  = Winer::paginate(10);
+
         return view('admin.request.index',compact('Winer'));
+
+
+    }
+
+    public function changestatus($id)
+    {
+        $winer=Winer::where('id',$id)->first();
+        $iduser=$winer->user_id;
+        $user=User::where('id',$iduser)->first();
+        if($winer->status ==0)
+        {
+            DB::table('winers')->where('id','=',$id)->update(['status' => "1"]);
+
+        }
+        Mail::to($user->email)->send(new MailApprove($user));
+        return back()->with('success','Approve Winer !');
     }
     /**
      * Show the form for creating a new resource.
