@@ -25,6 +25,8 @@ ALTER TABLE `awards` ADD `deleted_at` TIMESTAMP NULL AFTER `updated_at`;
 -------------------
 ALTER TABLE `tasks` ADD `title` VARCHAR(191) NOT NULL AFTER `created_at`, ADD `description` VARCHAR(191) NOT NULL AFTER `title`, ADD `channel_name` VARCHAR(191) NOT NULL AFTER `description`,
  ADD `url_link` VARCHAR(192) NOT NULL AFTER `channel_name`;
+
+ ALTER TABLE `tasks` DROP `task`;
 -------------------
 
 ALTER TABLE `game_sessions` ADD `use_try_ads` INT(11) NOT NULL AFTER `game_id`;
