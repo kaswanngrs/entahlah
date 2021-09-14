@@ -26,9 +26,11 @@ Route::post('For_Get_Pasword', 'API\UserController@For_Get_Pasword');
 
 // });
 Route::group(['middleware' => 'auth:api','prefix'=>'auth'], function(){
+
     Route::post('updateprofile','UsersChangeController@updateprofile');
-    Route::get('check_number_id','UsersChangeController@check_number_id');
-    Route::get('minuspoint','UsersChangeController@minuspoint');
+    Route::get('check_number_id/{type}','UsersChangeController@check_number_id');
+    Route::get('getInformation','UsersChangeController@getInformation');
+
     Route::post('details', 'API\UserController@details');
     Route::post('set_user_points', 'API\UserController@setUserPoint');
     Route::post('join-game','GamesController@joinGame')->name('game.join');
