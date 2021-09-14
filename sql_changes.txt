@@ -33,3 +33,13 @@ ALTER TABLE `game_sessions` ADD `use_try_ads` INT(11) NOT NULL AFTER `game_id`;
 ALTER TABLE `game_sessions` ADD `date_end_attempts` DATE NULL AFTER `updated_at`;
 
 CREATE TABLE `ostora`.`conter_questions` ( `id` INT NOT NULL AUTO_INCREMENT , `user_id` INT(11) NOT NULL , `question_id` INT(11) NOT NULL , `created_at` TIMESTAMP(6) NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+
+--------new sql change--------
+ALTER TABLE `notifcations` ADD `user_id` INT NOT NULL AFTER `message`;
+
+ALTER TABLE `winers` ADD `status` INT(1) NOT NULL DEFAULT '0' AFTER `user_id`;
+
+
+ALTER TABLE `users` ADD `number_id_pubg` VARCHAR(191) NULL AFTER `password`,
+ADD `number_id_freefire` VARCHAR(191) NULL AFTER `number_id_pubg`,
+ADD `number_id_googleplay` VARCHAR(191) NULL AFTER `number_id_freefire`;

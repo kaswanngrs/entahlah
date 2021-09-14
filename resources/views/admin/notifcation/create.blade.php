@@ -11,9 +11,16 @@
     <form action="{{ url('/notifction/store') }}" method="post">
         @csrf
         <div class="row">
+            <div class="col-12 ">
+                <label for="exampleFormControlSelect1">Users</label>
+                <select class="form-control" name=id_user>
+                    @foreach ($user as $users)
+                    <option value="{{ $users->id }}" >{{ $users->name}}</option>
+                    @endforeach
+                </select>
+              </div>
 
-
-            <div class="col-12  ">
+            <div class="col-12 ">
                 <div class="form-group">
                     <label for="#Message">Message:</label>
                     <textarea name="message" id="Message" class="form-control  col-12" required></textarea>

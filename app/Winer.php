@@ -9,7 +9,7 @@ class Winer extends Model
     //
 
     protected $fillable = [
-        'code', 'user_id','award_id'
+        'code', 'user_id','award_id','status'
     ];
 
 
