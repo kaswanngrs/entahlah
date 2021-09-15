@@ -13,6 +13,7 @@ class UsersChangeController extends Controller
     public function updateprofile(Request $request)
     {
         $id = Auth::user()->id;
+
         $this->validate(
             $request,
             [
@@ -35,11 +36,11 @@ class UsersChangeController extends Controller
             unset($data['number_id_freefire']);
 
         if ($data['number_id_pubg']  ===  null)
-            unset($data['number_id_pubg']);
+           $data['number_id_pubg']=Auth::user()->number_id_pubg;
         if ($data['number_id_googleplay']  ===  null)
-            unset($data['number_id_googleplay']);
+            $data['number_id_googleplay']=Auth::user()->number_id_googleplay;
         if ($data['number_id_freefire']   ===  null)
-            unset($data['number_id_freefire']);
+            $data['number_id_freefire']=Auth::user()->number_id_freefire;
 
         $user = User::where('id', $id)->update($data);
         return response()->json([
