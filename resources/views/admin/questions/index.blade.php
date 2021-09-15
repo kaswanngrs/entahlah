@@ -2,53 +2,53 @@
 
 @section('content')
 
-<div class="container">
+    <div class="container">
         <div class="row">
-            <h3 style="color :rgb(130 138 146) !important; overflow: hidden; text-align: cente" >Questions and Answers</h3>
+            <h3 style="color :rgb(130 138 146) !important; overflow: hidden; text-align: cente">Questions and Answers</h3>
 
-            <div style="width: 100%"><a  href="/questions/create" class="btn btn-primary" style="float: right; margin: 4px">Add Question</a></div>
+            <div style="width: 100%"><a href="/questions/create" class="btn btn-primary"
+                    style="float: right; margin: 4px">Add Question</a></div>
             <table class="table table-striped">
                 <thead>
-                  <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Question</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Correct Answer</th>
-                    <th scope="col">Options</th>
-                  </tr>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Question</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Correct Answer</th>
+                        <th scope="col">Options</th>
+                    </tr>
                 </thead>
                 <tbody>
-                    @if(count($questions) > 0)
-                    @php
-                        $i = 0;
-                    @endphp
-                        @foreach ($questions as $question)
+                    @if (count($questions) > 0)
                         @php
-                            $i++;
+                            $i = 0;
                         @endphp
-                        <tr>
-                            <th scope="row">{{$i}}</th>
-                            <td>{{$question['question_title']}}</td>
-                            <td>{{$question['question_status']}}</td>
-                            <td>{{$question['question_correct_answer']}}</td>
+                        @foreach ($questions as $question)
+                            @php
+                                $i++;
+                            @endphp
+                            <tr>
+                                <th scope="row">{{ $i }}</th>
+                                <td>{{ $question['question_title'] }}</td>
+                                <td>{{ $question['question_status'] }}</td>
+                                <td>{{ $question['question_correct_answer'] }}</td>
 
-                            <td>
+                                <td>
 
-                                <a href="questions/edit/{{$question['question_id']}}" class="btn btn-primary">Edit</a>
-                                <a href="questions/delete/{{$question['question_id']}}" class="btn btn-danger">Delete</a>
+                                    <a href="questions/edit/{{ $question['question_id'] }}" class="btn btn-primary">Edit</a>
+                                    <a href="questions/delete/{{ $question['question_id'] }}"
+                                        class="btn btn-danger">Delete</a>
 
-                            </td>
+                                </td>
 
-                        </tr>
+                            </tr>
                         @endforeach
 
                     @endif
 
 
                 </tbody>
-              </table>
+            </table>
         </div>
-
-</div>
-
+    </div>
 @endsection

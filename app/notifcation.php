@@ -7,6 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class notifcation extends Model
 {
     //
-    protected $fillable = ["message"];
+    protected $fillable = ["user_id","message"];
 
 }

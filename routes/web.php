@@ -11,14 +11,15 @@
 |
 */
 
-
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
 Auth::routes();
 
 Route::middleware(['admin'])->group(function () {
-
+    Route::get('/request','WinerController@index')->name('request');
+    Route::post('changestatus/{id}','WinerController@changestatus')->name('changestatus');
     Route::get('/home', 'HomeController@index')->name('home');
-
     // users
     Route::get('/users', 'API\UserController@index')->name('users');
     Route::get('/users/edit/{id}', 'API\UserController@edit')->name('users.edit');
@@ -42,17 +43,34 @@ Route::middleware(['admin'])->group(function () {
     Route::post('/games/update/{id}','GamesController@update')->name('games.update');
     Route::post('/games/update-attributes/{id}','GamesController@updateAttributes')->name('games.updateAttributes');
     Route::get('/games/update-attributes/{id}','GamesController@updateAttributes')->name('games.updateAttributes');
+Route::prefix('task')->group(function()
+{
+    Route::get('show','TaskController@index')->name('show');
+    Route::get('/task/create','TaskController@create')->name('create');
+    Route::post('/task/store','TaskController@store')->name('store');
+    Route::get('edit/{id}','TaskController@edit')->name('edit');
+    Route::get('delete/{id}','TaskController@destroy')->name('destroy');
+    Route::post('update/{id}','TaskController@update')->name('update');
+});
 
-    Route::get('/task/create','TaskController@create');
-    Route::post('/task/store','TaskController@store');
-    Route::get('/awards/create','AwardsController@create');
-    Route::post('/awards/store','AwardsController@store');
+Route::prefix('awards')->group(function()
+{
+    Route::get('create','AwardsController@create')->name('create.awards');
+    Route::post('store','AwardsController@store')->name('store.awards');
+    Route::get('show','AwardsController@index')->name('show.awards');
+    Route::get('delete/{id}','AwardsController@destroy')->name('delete.awards');
+    Route::get('edit/{id}','AwardsController@edit')->name('edit.awards');
+    Route::post('update/{id}','AwardsController@update')->name('update.awards');
+});
+    // Route::get('request','AwardsController@request')->name('request');
     Route::get('/notifction/create','notifctionController@create');
     Route::post('/notifction/store','notifctionController@store');
 
 });
-
-
-
+Route::get('privacyploicy.html','PrivacyPolicyController@index');
 Route::view('/', 'auth.login');
+
+
+
+
 

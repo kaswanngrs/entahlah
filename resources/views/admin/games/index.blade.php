@@ -52,8 +52,8 @@
         </div>
 
     </div>
+{{ $games->links() }}
 
 
- 
-    
+
 @endsection

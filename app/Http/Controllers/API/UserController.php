@@ -8,11 +8,15 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\User;
 use App\UserPoints;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Validator;
+// use Validator;
 use Illuminate\Support\Str;
 
-use DB;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use App\Mail\ForgetPassword;
+use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
 {
@@ -53,31 +57,39 @@ class UserController extends Controller
 
     public function check_code_Password(Request $request)
     {
-        $flag = true;
         $validator = Validator::make(request()->all(), [
-            'code' => 'required',
-
+            'code' => 'required|unique:password_resets',
         ]);
-        if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], 401);
+        $password_reset = DB::table('password_resets')->where('token', $request->code)->first();
+        $end = Carbon::now();
+        if($password_reset)
+        {
+            $t = strtotime($password_reset->created_at);
+            if (strtotime('+15 minutes',$t) >= (strtotime($end))) {
+                return response()->json(['success' => true, 'mesg' => 'code is match'],200);
+            }
+            return response()->json(['success' => true, 'mesg' => 'please resend code'],200);
+        }
+        else
+        {
+            return response()->json(['success'=>true,'mesg'=>'not found code'],200);
         }
 
+        // if ($password_resets === null)
+        //     $flag = false;
 
-        $password_resets = DB::table('password_resets')->where('token', $request->input('code'))->first();
-
-        if ($password_resets === null)
-            $flag = false;
-
-        if ($flag  === true)
-            $message = "mcode is math";
-        else
-            $message = "mcode is  not math";
-        return response()->json(['success' =>  $flag, 'mesg' => $message], 200);
+        // if ($flag  === true)
+        //     $message = "mcode is math";
+        // else
+        //     $message = "mcode is  not math";
+        // return response()->json(['success' =>  $flag, 'mesg' => $message], 200);
     }
 
     public function password_resets(Request $request)
     {
-
+        $token = Str::random(6);
+        $user=User::where('email',$request->email)->first();
+        $templateemail=view('email',compact('user','token'));
         $validator = Validator::make(request()->all(), [
             'email' => 'required|email|exists:users',
         ]);
@@ -85,51 +97,72 @@ class UserController extends Controller
             return response()->json(['error' => $validator->errors()], 401);
         }
 
-
-        $token = Str::random(5);
-
         DB::table('password_resets')->insert([
             'email' => $request->email,
             'token' => $token,
-
+            'created_at'=>Carbon::now()
         ]);
 
-        $topic = "/topics/ostura";
-        $apiAccess = 'AAAASbubh_U:APA91bFkpouLinHPUEkZWwyHyiujWKA-eOcebUB9WzWQ_I38Sq4Ng6ifhG8N6OX6TBgOb8N8aPEqhmI1wRLaIXMMN_qzXumMpMHwv7splCvIJIqbEaybABZ7KQ8dIadv5urXYFFkFkKV';
-        $headers = array(
-            'Authorization: key=' . $apiAccess,
-            'Content-Type: application/json'
-        );
-        $fields = '{
-          "to": "' . $topic . '",
-              "notification": {
-               "title": "اسطورة",
-                "body": "' . $token  . '",
-                "sound": "default",
-                "color": "#990000",
-              },
-              "priority": "high",
-              "data": {
-               "click_action": "FLUTTER_NOTIFICATION_CLICK",
-              
-                },
-              }';
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, ($fields));
-        $result = curl_exec($ch);
-        curl_close($ch);
-
+       Mail::to($request->email)->send(new ForgetPassword ($user,$token));
         return response()->json(['success ' => 'is successfully'], 200);
+        // $curl = curl_init();
+
+        // curl_setopt_array($curl, array(
+        //     CURLOPT_URL => 'https://api.mailgun.net/v3/sandbox996afde24fbe4c7aa9ee7f9e3fbbbfd9.mailgun.org/messages',
+        //     CURLOPT_RETURNTRANSFER => true,
+        //     CURLOPT_ENCODING => '',
+        //     CURLOPT_MAXREDIRS => 10,
+        //     CURLOPT_TIMEOUT => 0,
+        //     CURLOPT_FOLLOWLOCATION => true,
+        //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        //     CURLOPT_CUSTOMREQUEST => 'POST',
+        //     CURLOPT_POSTFIELDS => array('from' => 'Mailgun Sandbox
+        //     <postmaster@sandbox996afde24fbe4c7aa9ee7f9e3fbbbfd9.mailgun.org>',
+        //     'to' =>$request->email,
+        //      'subject' => 'ForgetPassword',
+        //       'text' => $templateemail),
+        //     CURLOPT_HTTPHEADER => array(
+        //         'Authorization: Basic YXBpOjI1MjY0YTE2ZTgzZGUzOGIyMjBlNjg2YmYyOTVjYTY2LTE1NmRiMGYxLTc4YTJjMjYy'
+        //     ),
+        // ));
+        // $response = curl_exec($curl);
+        // curl_close($curl);
+        //  echo $response;
+
+        // $topic = "/topics/ostura";
+        // $apiAccess = 'AAAASbubh_U:APA91bFkpouLinHPUEkZWwyHyiujWKA-eOcebUB9WzWQ_I38Sq4Ng6ifhG8N6OX6TBgOb8N8aPEqhmI1wRLaIXMMN_qzXumMpMHwv7splCvIJIqbEaybABZ7KQ8dIadv5urXYFFkFkKV';
+        // $headers = array(
+        //     'Authorization: key=' . $apiAccess,
+        //     'Content-Type: application/json'
+        // );
+        // $fields = '{
+        //   "to": "' . $topic . '",
+        //       "notification": {
+        //        "title": "اسطورة",
+        //         "body": "' . $token  . '",
+        //         "sound": "default",
+        //         "color": "#990000",
+        //       },
+        //       "priority": "high",
+        //       "data": {
+        //        "click_action": "FLUTTER_NOTIFICATION_CLICK",
+
+        //         },
+        //       }';
+        // $ch = curl_init();
+        // curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
+        // curl_setopt($ch, CURLOPT_POST, true);
+        // curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        // curl_setopt($ch, CURLOPT_POSTFIELDS, ($fields));
+        // $result = curl_exec($ch);
+        // curl_close($ch);
+
+
     }
     public function login()
     {
-
-
         try {
             $falg = false;
             $validator = Validator::make(request()->all(), [
@@ -153,7 +186,7 @@ class UserController extends Controller
                     Auth::loginUsingId($user->id);
                 else {
                     $input =  request()->all();
-                    $validator = Validator::make( $input, [
+                    $validator = Validator::make($input, [
                         'name' => ['required', 'string', 'max:255'],
                         'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
                         'age' => ['required', 'integer'],
@@ -222,7 +255,7 @@ class UserController extends Controller
 
     public function index()
     {
-        $users = User::all()->where('role', 'user');
+        $users = User::where('role', 'user')->paginate(10);
 
         return view('admin.users.index', ['users' => $users]);
     }

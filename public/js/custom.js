@@ -70,8 +70,10 @@
                             correct_answer_id:correctAnswer ,
                         },
                         success: function(data) {
-                            console.log('success', data);
-
+                            if(data.success)
+                            {
+                                location.href="/questions";
+                            }
                 },
                 error: function(data) {
                     console.log('An error occurred.');

@@ -5,7 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Task;
 use App\UserPoints;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Response;
 
 class TaskController extends Controller
 {
@@ -16,48 +21,57 @@ class TaskController extends Controller
      */
     public function index()
     {
-        //
+        $tasks = Task::paginate(10);
+        return view('admin.task.Show', compact('tasks'));
     }
 
+
     /**
-     * Display a listing of the resource. use api  this function get all task  and create new link 
+     * Display a listing of the resource. use api  this function get all task  and create new link
      *
      * @return \Illuminate\Http\Response
      */
-    public function indexApi()
+    public function indexApi(Request $request)
     {
-        //
-      $Task = Task ::all();
-      $arrayTask  =array();
-      foreach ($Task  as $task){
-        
+        $limit = 1;
 
-        $arrayTask[] =  url('').'/api/auth/ShowLink/'.$task->id; 
+        $offset = $request->page ?? 1;
+        $offset = ($offset-1) * $limit;
 
-      }
-      return response()->json([$arrayTask],200);
+        $Task = Task::offset($offset)->limit(1)->get();
+        $alltasks  = array();
 
+        foreach ($Task  as $task) {
+            $arrayTask['url'] =  url('') . '/api/auth/ShowLink/' . $task->id;
+            $arrayTask['title'] =  $task->title;
+            $arrayTask['channel_name'] =  $task->channel_name;
+            $arrayTask['url_link'] =  $task->url_link;
+            $arrayTask['description'] =  $task->description;
+            $alltasks[]=$arrayTask;
+        }
+        if(!empty($alltasks)){
+            $respons['status'] = 'true';
+            $respons['message'] = 'Task list';
+            $respons['data']=$alltasks;
+        }else{
+           $respons['status'] = 'false';
+           $respons['message'] = 'Task is not found.';
+        }
+        return Response::json($respons,200);
     }
-    
-
 
     public function ShowLink($id)
     {
-        //
-        
-        $Task = Task ::find($id);
- 
-        if($Task == null )
-            return response()->json(["msg" => "you have error "],401);
-        
-   
+        $Task = Task::find($id);
+        if ($Task == null)
+            return response()->json(["msg" => "you have error "], 401);
+
         return  redirect()->away($Task->Task);
-
-
     }
 
 
-    public function addPointTask(Request $request){
+    public function addPointTask(Request $request)
+    {
 
         $user_points = \App\UserPoints::updateOrCreate(
             [
@@ -70,8 +84,7 @@ class TaskController extends Controller
         );
         $user_points->increment('points', 15);
         $user_points->save();
-        return response()->json(['task'=>'success Add task point ', 'Add_point'=>true],200);
-
+        return response()->json(['task' => 'success Add task point ', 'Add_point' => true], 200);
     }
     /**
      * Show the form for creating a new resource.
@@ -82,7 +95,6 @@ class TaskController extends Controller
     {
         //
         return view('admin.task.create');
-
     }
 
     /**
@@ -93,10 +105,22 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
-        
+        $this->validate($request,
+        [
+            'title'=>'required|string',
+            'description'=>'required|string',
+            'channel_name'=>'required|string',
+            'url_link'=>'required|string',
+        ]);
         //
-        $Task = Task ::create(["Task" => $request->input('Task')]) ;  
-        return back();
+        $Task = Task::create(
+        [
+            "title" => $request->title,
+            "description" => $request->description,
+            "channel_name" => $request->channel_name,
+            "url_link" => $request->url_link,
+        ]);
+        return redirect()->route('show');
     }
 
     /**
@@ -108,8 +132,8 @@ class TaskController extends Controller
     public function show($id)
     {
         //
-       
-        
+
+
     }
 
     /**
@@ -120,7 +144,8 @@ class TaskController extends Controller
      */
     public function edit($id)
     {
-        // 
+        $task = Task::where('id', $id)->first();
+        return view('admin.task.edit', compact('task'));
     }
 
     /**
@@ -132,7 +157,19 @@ class TaskController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $this->validate($request, [
+            'title'=>'required|string',
+            'description'=>'required|string',
+            'channel_name'=>'required|string',
+            'url_link'=>'required|string',
+
+        ]);
+        $input["title"] = $request->title;
+        $input["description"] = $request->description;
+        $input["channel_name"] = $request->channel_name;
+        $input["url_link"] = $request->url_link;
+        DB::table('tasks')->where('id', '=', $id)->update($input);
+        return redirect()->route('show');
     }
 
     /**
@@ -143,6 +180,8 @@ class TaskController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $tasks = Task::find($id);
+        $tasks->delete();
+        return back();
     }
 }

@@ -3,9 +3,10 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\SoftDeletes;
 class Task extends Model
 {
-    //Task
-    protected $fillable = ['Task'];
+    use SoftDeletes;
+    protected $fillable = ['title','description','channel_name','url_link'];
+    protected $dates = ['deleted_at'];
 }
