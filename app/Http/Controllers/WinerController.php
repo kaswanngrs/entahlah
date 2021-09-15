@@ -75,14 +75,9 @@ class WinerController extends Controller
      */
     public function storeApi(Request $request)
     {
-        $rules = [
-            'code' => ['required', 'string', 'max:255'],
-            'award_id' => ['required'],
-        ];
-        $validator = Validator::make($request->all(), $rules);
-        if ($validator->fails())
-            return response()->json([$validator->errors()->first()], 401);
-        $awards = awards::find($request->input('award_id'));
+        $this->validate($request,[
+            'award_id' => 'required']);
+        $awards = awards::find($request->award_id);
         $point = \App\UserPoints::where('user_id', '=', Auth::user()->id)->first();
         if ($awards === null)
         return response()->json([" The award does not exists  "], 401);
@@ -99,14 +94,13 @@ class WinerController extends Controller
                 'points' => Auth::user()->user_points ? Auth::user()->points : 0,
             ]
         );
-        $user_points->decrement('points', $awards->point);
+        // $user_points->decrement('points', $awards->point);
         $user_points->save();
         $Winer = Winer::create([
-            "code" => $request->input('code'),
             "user_id" => Auth::user()->id,
             'award_id' =>  $request->input('award_id'),
         ]);
-        return response()->json(["Winer"=> $Winer ,"point"=> $user_points,'Awards' =>$awards," You need more point "], 202);
+        return response()->json(["Winer"=> $Winer ,"point"=> $user_points,'Awards' =>$awards," You need more point "],202);
     }
     /**
      * Display the specified resource.
