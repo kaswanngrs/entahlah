@@ -35,12 +35,7 @@ class UsersChangeController extends Controller
         if ($data['number_id_freefire']   ===  null)
             unset($data['number_id_freefire']);
 
-        if ($data['number_id_pubg']  ===  null)
-           $data['number_id_pubg']=Auth::user()->number_id_pubg;
-        if ($data['number_id_googleplay']  ===  null)
-            $data['number_id_googleplay']=Auth::user()->number_id_googleplay;
-        if ($data['number_id_freefire']   ===  null)
-            $data['number_id_freefire']=Auth::user()->number_id_freefire;
+ 
 
         $user = User::where('id', $id)->update($data);
         return response()->json([
