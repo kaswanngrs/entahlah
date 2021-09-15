@@ -70,4 +70,6 @@ class UsersChangeController extends Controller
             return response()->json(['type' => 'freefire', 'number_id_pubg' => $number_id_freefire,], 200);
         }
     }
+
+
 }
