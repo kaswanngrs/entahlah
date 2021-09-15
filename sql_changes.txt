@@ -43,3 +43,5 @@ ALTER TABLE `winers` ADD `status` INT(1) NOT NULL DEFAULT '0' AFTER `user_id`;
 ALTER TABLE `users` ADD `number_id_pubg` VARCHAR(191) NULL AFTER `password`,
 ADD `number_id_freefire` VARCHAR(191) NULL AFTER `number_id_pubg`,
 ADD `number_id_googleplay` VARCHAR(191) NULL AFTER `number_id_freefire`;
+_______________________
+ALTER TABLE `awards` ADD `type` VARCHAR(191) NOT NULL AFTER `point`;

@@ -18,14 +18,15 @@ class AwardsController extends Controller
      */
     public function index()
     {
-        $awards=awards::paginate(10);
-        return view('admin.awards.index',compact('awards'));
+        $awards = awards::paginate(10);
+        return view('admin.awards.index', compact('awards'));
     }
 
 
-    public function  indexApi(){
-        $awards  =awards ::all();
-        return response()->json(["awards"=>$awards], 200);
+    public function  indexApi()
+    {
+        $awards  = awards::all();
+        return response()->json(["awards" => $awards], 200);
     }
     /**
      * Show the form for creating a new resource.
@@ -50,22 +51,21 @@ class AwardsController extends Controller
     public function store(Request $request)
     {
         //
-        $rules = [
-            'name' => ['required', 'string', 'max:255'],
-            'img' => ['required'],
-            'point' => ['required|numeric'],
-        ];
+        $this->validate($request, [
+            'name' => 'required', 'string', 'max:255',
+            'img' => 'required',
+            'type' => 'required',
+            'point' => 'required|numeric',
+        ]);
 
-        $validator = Validator::make($request->all(), $rules);
-
-        if ($validator->fails())
-            return response()->json([$validator->errors()->first()], 401);
-
-        $data = $request->all();
         $data['point'] =  (int) $request->input('point');
-        $imageName = time().'.'.$request->img->getClientOriginalExtension();
+        $data['name'] = $request->input('name');
+        $imageName = time() . '.' . $request->img->getClientOriginalExtension();
         $request->img->move(public_path('images/award'), $imageName);
-        $data['img']=$imageName;
+        $data['img'] = $imageName;
+
+        $data['type'] = $request->input('type');
+        // dd($data);
         $awards = awards::create($data);
         return redirect()->route('show.awards');
     }
@@ -89,8 +89,8 @@ class AwardsController extends Controller
      */
     public function edit($id)
     {
-        $award=awards::find($id);
-        return view('admin.awards.edit',compact('award'));
+        $award = awards::find($id);
+        return view('admin.awards.edit', compact('award'));
     }
 
     /**
@@ -106,18 +106,21 @@ class AwardsController extends Controller
 
         // ]);
 
-        $rules =[
-            'name' => ['required', 'string', 'max:255'],
-            'img' => ['required'],
-            'point' => ['required','numeric'],
-        ];
-       $this->validate($request, $rules);
-        $imageName = time().'.'.$request->img->getClientOriginalExtension();
+        $this->validate($request, [
+            'name' => 'required', 'string', 'max:255',
+            'img' => 'required',
+            'type' => 'required',
+            'point' => 'required|numeric',
+        ]);
+
+        $imageName = time() . '.' . $request->img->getClientOriginalExtension();
         $request->img->move(public_path('images/award'), $imageName);
-        $input['img']=$imageName;
+        $input['img'] = $imageName;
         $input['name'] = $request->name;
         $input['point'] = $request->point;
-        DB::table('awards')->where('id','=',$id)->update($input);
+        $input['type'] = $request->type;
+        // dd($data);
+        DB::table('awards')->where('id', '=', $id)->update($input);
         return redirect()->route('show.awards');
     }
 
@@ -129,9 +132,9 @@ class AwardsController extends Controller
      */
     public function destroy($id)
     {
-     $awards = awards::find($id);
-    //  dd($awards);
-     $awards->delete();
-     return back();
+        $awards = awards::find($id);
+        //  dd($awards);
+        $awards->delete();
+        return back();
     }
 }
