@@ -1,3 +1,4 @@
+
 <?php
 
 namespace App\Http\Controllers;
@@ -30,6 +31,7 @@ class UsersChangeController extends Controller
 
  
 
+        
         $user = User::where('id', $id)->update($data);
         return response()->json([
             'user_updated' => true,
