@@ -29,11 +29,13 @@ class UsersChangeController extends Controller
         $data['number_id_googleplay']        = $request->number_id_googleplay;
 
         if ($data['number_id_pubg']  ===  null)
-        unset($data['number_id_pubg']);
-    if ($data['number_id_googleplay']  ===  null)
-        unset($data['number_id_googleplay']);
-    if ($data['number_id_freefire']   ===  null)
-        unset($data['number_id_freefire']);
+            unset($data['number_id_pubg']);
+        if ($data['number_id_googleplay']  ===  null)
+            unset($data['number_id_googleplay']);
+        if ($data['number_id_freefire']   ===  null)
+            unset($data['number_id_freefire']);
+
+
         $user = User::where('id', $id)->update($data);
         return response()->json([
             'user_updated' => true,
@@ -70,6 +72,4 @@ class UsersChangeController extends Controller
             return response()->json(['type' => 'freefire', 'number_id_pubg' => $number_id_freefire,], 200);
         }
     }
-
-
 }
