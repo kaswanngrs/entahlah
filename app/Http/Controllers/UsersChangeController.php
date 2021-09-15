@@ -34,6 +34,13 @@ class UsersChangeController extends Controller
         if ($data['number_id_freefire']   ===  null)
             unset($data['number_id_freefire']);
 
+        if ($data['number_id_pubg']  ===  null)
+            unset($data['number_id_pubg']);
+        if ($data['number_id_googleplay']  ===  null)
+            unset($data['number_id_googleplay']);
+        if ($data['number_id_freefire']   ===  null)
+            unset($data['number_id_freefire']);
+
         $user = User::where('id', $id)->update($data);
         return response()->json([
             'user_updated' => true,
@@ -46,30 +53,28 @@ class UsersChangeController extends Controller
         $user = Auth::user();
         return response()->json(
             [
-              'email'=>$user->email,
-              'number_id_pubg'=>$user->number_id_pubg,
-              'number_id_freefire'=>$user->number_id_freefire,
-              'number_id_googleplay'=>$user->number_id_googleplay,
-            ]);
+                'email' => $user->email,
+                'number_id_pubg' => $user->number_id_pubg,
+                'number_id_freefire' => $user->number_id_freefire,
+                'number_id_googleplay' => $user->number_id_googleplay,
+            ]
+        );
     }
 
     public function check_number_id($type)
     {
         $user = Auth::user();
-        if($type==="pubg")
-        {
+        if ($type === "pubg") {
             $number_id_pubg = $user->number_id_pubg ? true : false;
-            return response()->json(['type'=>'pubg','number_id_pubg' => $number_id_pubg],200);
+            return response()->json(['type' => 'pubg', 'number_id_pubg' => $number_id_pubg], 200);
         }
-        if($type==="googleplay")
-        {
+        if ($type === "googleplay") {
             $number_id_googleplay = $user->number_id_googleplay ? true : false;
-            return response()->json(['type'=>'googleplay','number_id_pubg' => $number_id_googleplay,],200);
+            return response()->json(['type' => 'googleplay', 'number_id_pubg' => $number_id_googleplay,], 200);
         }
-        if($type==="freefire")
-        {
+        if ($type === "freefire") {
             $number_id_freefire = $user->number_id_freefire ? true : false;
-            return response()->json(['type'=>'freefire','number_id_pubg' => $number_id_freefire,],200);
+            return response()->json(['type' => 'freefire', 'number_id_pubg' => $number_id_freefire,], 200);
         }
     }
 

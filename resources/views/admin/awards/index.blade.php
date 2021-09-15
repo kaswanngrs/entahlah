@@ -14,6 +14,7 @@
                         <th scope="col">#</th>
                         <th scope="col">Name</th>
                         <th scope="col">point</th>
+                        <th scope="col">type</th>
                         <th scope="col">Image</th>
                         <th scope="col">Edit</th>
                         <th scope="col">Delete</th>
@@ -29,6 +30,7 @@
                                 <th scope="row">{{ $i++ }}</th>
                                 <td>{{ $award->name }}</td>
                                 <td>{{ $award->point }}</td>
+                                <td>{{ $award->type }}</td>
                                 <td><img src="{{ url('/images/award/' . $award->img) }}" style="width: 40%;height: 67px;"
                                         class="img-responsive"></td>
                                 <td>

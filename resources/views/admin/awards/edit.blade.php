@@ -32,6 +32,20 @@
                         @endforeach
                     @endif
 
+
+                    <div class="row col-4">
+                        <div class="">
+                            <div class="form-group">
+                                <label for="">Type</label>
+                              <select class="selectpicker form-control" name="type">
+                                <option value="pubg">pubg</option>
+                                <option value="googleplay" >googleplay</option>
+                                <option value="freefire" >freefire</option>
+                              </select>
+                            </div>
+                          </div>
+                    </div>
+
                     <div class="row col-lg-10">
                         <div class="custom-file" style="margin-top: 7%;">
                             <input type="file" name="img" class="custom-file-input" id="imge" required>
