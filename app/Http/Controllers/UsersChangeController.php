@@ -10,14 +10,14 @@ use Illuminate\Support\Facades\Auth;
 
 class UsersChangeController extends Controller
 {
-    public function updateprofile(Request $request)
+  public function updateprofile(Request $request)
     {
         $id = Auth::user()->id;
 
         $this->validate(
             $request,
             [
-                'email'                => 'required|email',
+                'email'                => 'required|email'.$id,
                 'number_id_pubg'       => 'nullable',
                 'number_id_freefire'   => 'nullable',
                 'number_id_googleplay' => 'nullable',
@@ -27,6 +27,9 @@ class UsersChangeController extends Controller
         $data['number_id_pubg']              = $request->number_id_pubg;
         $data['number_id_freefire']          = $request->number_id_freefire;
         $data['number_id_googleplay']        = $request->number_id_googleplay;
+
+        if ($data['email']  ===  null)
+        unset($data['email']);
 
         if ($data['number_id_pubg']  ===  null)
         unset($data['number_id_pubg']);
@@ -40,7 +43,6 @@ class UsersChangeController extends Controller
             'user' => $data
         ], 201);
     }
-
     public function getInformation()
     {
         $user = Auth::user();
