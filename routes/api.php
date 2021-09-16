@@ -65,4 +65,5 @@ Route::group(['middleware' => 'auth:api','prefix'=>'auth'], function(){
 
 });
 Route::get('reset_time_attimpte','GamesController@reset_time_attimpte');
-Route::get('showTask','TaskController@indexApi');
+Route::get('ShowLink/{id}','TaskController@ShowLink');
+Route::post('checkcode','UsersChangeController@checkcode');
