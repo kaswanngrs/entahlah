@@ -50,7 +50,7 @@ Route::group(['middleware' => 'auth:api','prefix'=>'auth'], function(){
     Route::get('Task','TaskController@show');
     Route::get('showTask','TaskController@indexApi');
 
-    Route::get('ShowLink/{id}','TaskController@ShowLink');
+
     Route::get('addPointTask','TaskController@addPointTask');
 
 
@@ -64,5 +64,6 @@ Route::group(['middleware' => 'auth:api','prefix'=>'auth'], function(){
     Route::post('counterquestion','QuestionsController@counterquestion');
 
 });
+Route::get('ShowLink/{id}','TaskController@ShowLink');
 Route::get('reset_time_attimpte','GamesController@reset_time_attimpte');
 Route::get('showTask','TaskController@indexApi');
