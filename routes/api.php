@@ -62,8 +62,8 @@ Route::group(['middleware' => 'auth:api','prefix'=>'auth'], function(){
     Route::get('get_All_Notifcation','notifctionController@getAllNotifcation');
     Route::get('showinformation','GamesController@showattent');
     Route::post('counterquestion','QuestionsController@counterquestion');
+Route::post('checkcode','UsersChangeController@checkcode');
 
 });
 Route::get('reset_time_attimpte','GamesController@reset_time_attimpte');
 Route::get('ShowLink/{id}','TaskController@ShowLink');
-Route::post('checkcode','UsersChangeController@checkcode');
