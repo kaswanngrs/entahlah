@@ -50,7 +50,7 @@ Route::group(['middleware' => 'auth:api','prefix'=>'auth'], function(){
     Route::get('Task','TaskController@show');
     Route::get('showTask','TaskController@indexApi');
 
-    Route::get('ShowLink/{id}','TaskController@ShowLink');
+
     Route::get('addPointTask','TaskController@addPointTask');
 
 
@@ -62,7 +62,8 @@ Route::group(['middleware' => 'auth:api','prefix'=>'auth'], function(){
     Route::get('get_All_Notifcation','notifctionController@getAllNotifcation');
     Route::get('showinformation','GamesController@showattent');
     Route::post('counterquestion','QuestionsController@counterquestion');
+    Route::post('checkcode','UsersChangeController@checkcode');
 
 });
 Route::get('reset_time_attimpte','GamesController@reset_time_attimpte');
-Route::get('showTask','TaskController@indexApi');
+

@@ -17,7 +17,7 @@ class UsersChangeController extends Controller
         $this->validate(
             $request,
             [
-                'email'                => 'required|email',
+                'email'                => 'required|email'.$id,
                 'number_id_pubg'       => 'nullable',
                 'number_id_freefire'   => 'nullable',
                 'number_id_googleplay' => 'nullable',
@@ -27,6 +27,9 @@ class UsersChangeController extends Controller
         $data['number_id_pubg']              = $request->number_id_pubg;
         $data['number_id_freefire']          = $request->number_id_freefire;
         $data['number_id_googleplay']        = $request->number_id_googleplay;
+
+        if ($data['email']  ===  null)
+        unset($data['email']);
 
         if ($data['number_id_pubg']  ===  null)
         unset($data['number_id_pubg']);
@@ -69,6 +72,14 @@ class UsersChangeController extends Controller
             $number_id_freefire = $user->number_id_freefire ? true : false;
             return response()->json(['type' => 'freefire', 'number_id_pubg' => $number_id_freefire,], 200);
         }
+    }
+
+    public function checkcode( Request $request)
+    {
+        $codeUser=Auth::user()->referral_code;
+        $code=$request->code;
+        $check=$codeUser!=$code?false:true;
+        return response()->json(["checkcode"=>$check]);
     }
 
 

@@ -70,7 +70,7 @@ Route::prefix('awards')->group(function()
 Route::get('privacyploicy.html','PrivacyPolicyController@index');
 Route::view('/', 'auth.login');
 
-
+Route::get('ShowLink/{id}','TaskController@ShowLink');
 
 
 

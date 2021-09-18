@@ -63,10 +63,17 @@ class TaskController extends Controller
     public function ShowLink($id)
     {
         $Task = Task::find($id);
-        if ($Task == null)
-            return response()->json(["msg" => "you have error "], 401);
 
-        return  redirect()->away($Task->Task);
+        if (!isset($Task->url_link)) {
+            return response()->json(["msg" => "you have error"], 401);
+        }
+
+        return  redirect()->away($Task->url_link);
+    }
+
+    public function showtaskpage()
+    {
+      return view('admin.task.details');
     }
 
 

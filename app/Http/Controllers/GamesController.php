@@ -411,7 +411,7 @@ class GamesController extends Controller
             $mutable = Carbon::now();
             $gameSession->date_end_attempts =  $mutable->addDay('1')->format('Y-m-d');
         }
-        if ($attempts < $GameAttribute->attempts)
+        if ($attempts <= $GameAttribute->attempts)
             $gameSession->increment('attempts', 1);
         elseif ($gameSession->use_try_ads < $gameSession->try_ads) {
             $gameSession->increment('use_try_ads', 1);
@@ -425,7 +425,7 @@ class GamesController extends Controller
         $data['number_add_try_ads'] = $gameSession->try_ads;
         $data['game_session']  = $gameSession;
 
-
+        $gameSession->save();
         return response()->json([$data], 200);
     }
 
@@ -465,7 +465,7 @@ class GamesController extends Controller
     {
         $mutable = Carbon::now();
         $mutable = $mutable->format('Y-m-d');
-        $gameSession = gameSession::where('date_end_attempts', '=', $mutable)->update([
+        $gameSession = gameSession::where(' ', '=', $mutable)->update([
 
             'use_try_ads' => 0,
             'try_ads' => 0,

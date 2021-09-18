@@ -56,7 +56,7 @@ class notifctionController extends Controller
             'Content-Type: application/json'
         );
         $fields = '{
-        "to": "' . $tokenApp . '",
+        "to": "' . $topic . '",
             "notification": {
              "title": "اسطورة",
               "body": "' . $message . '",

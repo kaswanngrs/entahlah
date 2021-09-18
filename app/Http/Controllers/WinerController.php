@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Http\Controllers;
+
 use Illuminate\Http\Request;
 use App\Winer;
 use App\awards;
@@ -23,30 +25,31 @@ class WinerController extends Controller
         //
         $Winer  = Winer::paginate(10);
 
-        return view('admin.request.index',compact('Winer'));
-
-
+        return view('admin.request.index', compact('Winer'));
     }
 
     public function changestatus($id)
     {
-        $winer=Winer::where('id',$id)->first();
-        $iduser=$winer->user_id;
-        $user=User::where('id',$iduser)->first();
-        if($winer->status ==0)
-        {
-            DB::table('winers')->where('id','=',$id)->update(['status' => "1"]);
-
+        $winer = Winer::where('id', $id)->first();
+        $iduser = $winer->user_id;
+        $user = User::where('id', $iduser)->first();
+        if ($winer->status == 0) {
+            DB::table('winers')->where('id', '=', $id)->update(['status' => "1"]);
         }
-        $userpoint=UserPoints::where('user_id',$iduser)->first();
-        $vocher=awards::where('id',$winer->award_id)->first();
-        if($vocher && $userpoint)
-        {
-            $total=($vocher->point)-($userpoint->points);
-            $userpoint=UserPoints::where('user_id',$iduser)->update(['points'=>$total]);
+        $userpoint = UserPoints::where('user_id', $iduser)->first();
+        $vocher = awards::where('id', $winer->award_id)->first();
+        if ($vocher && $userpoint) {
+            if ($userpoint->points >=  $vocher->point) {
+                $total = ($userpoint->points) - ($vocher->point);
+                $userpoint = UserPoints::where('user_id', $iduser)->update(['points' => $total]);
+                Mail::to($user->email)->send(new MailApprove($user));
+                return back()->with('success', 'Approve Winer !');
+            } else {
+                //  return  response()->json(["empty data "}],200);
+                return back()->with('error', 'empty data');
+            }
         }
-        Mail::to($user->email)->send(new MailApprove($user));
-        return back()->with('success','Approve Winer !');
+        return back()->with('error', 'empty data');
     }
     /**
      * Show the form for creating a new resource.
@@ -75,14 +78,15 @@ class WinerController extends Controller
      */
     public function storeApi(Request $request)
     {
-        $this->validate($request,[
-            'award_id' => 'required']);
+        $this->validate($request, [
+            'award_id' => 'required'
+        ]);
         $awards = awards::find($request->award_id);
         $point = \App\UserPoints::where('user_id', '=', Auth::user()->id)->first();
         if ($awards === null)
-        return response()->json([" The award does not exists  "], 401);
+            return response()->json([" The award does not exists  "], 401);
         if ($point === null)
-                return response()->json([" You need to collect starting points "], 401);
+            return response()->json([" You need to collect starting points "], 401);
         if ($point->points   <  $awards->point)
             return response()->json([" You need more point "], 401);
         $user_points = \App\UserPoints::updateOrCreate(
@@ -100,7 +104,7 @@ class WinerController extends Controller
             "user_id" => Auth::user()->id,
             'award_id' =>  $request->input('award_id'),
         ]);
-        return response()->json(["Winer"=> $Winer ,"point"=> $user_points,'Awards' =>$awards," You need more point "],202);
+        return response()->json(["Winer" => $Winer, "point" => $user_points, 'Awards' => $awards, " You need more point "], 202);
     }
     /**
      * Display the specified resource.
