@@ -48,8 +48,9 @@ class notifctionController extends Controller
         ]);
 
         $user=User::find((int)$request->id_user);
+        dd($user);
         $tokenApp= $user->token_App;
-        $topic = "/topics/ostura";
+        $topic = "/topics/ostura/";
         $apiAccess = 'AAAASbubh_U:APA91bFkpouLinHPUEkZWwyHyiujWKA-eOcebUB9WzWQ_I38Sq4Ng6ifhG8N6OX6TBgOb8N8aPEqhmI1wRLaIXMMN_qzXumMpMHwv7splCvIJIqbEaybABZ7KQ8dIadv5urXYFFkFkKV';
         $headers = array(
             'Authorization: key=' . $apiAccess,

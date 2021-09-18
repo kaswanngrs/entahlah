@@ -98,7 +98,6 @@ class WinerController extends Controller
                 'points' => Auth::user()->user_points ? Auth::user()->points : 0,
             ]
         );
-        // $user_points->decrement('points', $awards->point);
         $user_points->save();
         $Winer = Winer::create([
             "user_id" => Auth::user()->id,
